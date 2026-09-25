@@ -8,11 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { LanguageSelector } from "@/components/common/language-selector";
+import { useLanguage } from "@/hooks/use-language";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authenticate } from "@/actions/auth";
 
 function LoginForm() {
+  const { t } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
@@ -52,14 +55,23 @@ function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md shadow-lg">
-      <CardHeader className="text-center space-y-1">
-        <CardTitle className="text-2xl font-bold">
-          ਪੰਖ ਲਾਗਇਨ / Login
-        </CardTitle>
-        <CardDescription>
-          Enter your email and password to access your farm portal
-        </CardDescription>
+    <Card className="w-full max-w-md shadow-lg border-border/80">
+      <CardHeader className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Link href="/" className="text-xl font-bold tracking-tight text-primary">
+            {t.common.platformName}
+          </Link>
+          {/* Subtle switcher on the card */}
+          <LanguageSelector variant="pill" />
+        </div>
+        <div className="pt-2 text-center space-y-1">
+          <CardTitle className="text-2xl font-bold">
+            {t.auth.loginTitle}
+          </CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
+            {t.auth.loginSubtitle}
+          </CardDescription>
+        </div>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -70,11 +82,11 @@ function LoginForm() {
           )}
 
           <div className="space-y-1.5">
-            <Label htmlFor="email">ਈਮੇਲ / Email</Label>
+            <Label htmlFor="email">{t.auth.emailLabel}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="farmer@example.com"
+              placeholder={t.auth.emailPlaceholder}
               autoComplete="email"
               disabled={isSubmitting}
               {...register("email")}
@@ -85,11 +97,11 @@ function LoginForm() {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="password">ਪਾਸਵਰਡ / Password</Label>
+            <Label htmlFor="password">{t.auth.passwordLabel}</Label>
             <Input
               id="password"
               type="password"
-              placeholder="••••••••"
+              placeholder={t.auth.passwordPlaceholder}
               autoComplete="current-password"
               disabled={isSubmitting}
               {...register("password")}
@@ -101,15 +113,15 @@ function LoginForm() {
             )}
           </div>
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "ਲਾਗਇਨ ਹੋ ਰਿਹਾ ਹੈ... / Logging in..." : "ਲਾਗਇਨ ਕਰੋ / Login"}
+          <Button type="submit" className="w-full font-medium" disabled={isSubmitting}>
+            {isSubmitting ? t.auth.loggingInButton : t.auth.loginButton}
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="flex justify-center text-sm text-muted-foreground">
-        Don&apos;t have an account?{" "}
+      <CardFooter className="flex justify-center text-sm text-muted-foreground border-t pt-4">
+        {t.auth.noAccount}{" "}
         <Link href="/register" className="ml-1 text-primary hover:underline font-medium">
-          ਰਜਿਸਟਰ ਕਰੋ / Register
+          {t.auth.registerLink}
         </Link>
       </CardFooter>
     </Card>
