@@ -11,7 +11,9 @@ export default auth((req) => {
   const pathname = nextUrl.pathname;
 
   const isFarmerRoute =
-    pathname.startsWith("/dashboard") || pathname.startsWith("/farmer");
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/farmer") ||
+    pathname.startsWith("/onboarding");
   const isAdminRoute = pathname.startsWith("/admin");
   const isVetRoute = pathname.startsWith("/vet");
   const isAuthRoute =

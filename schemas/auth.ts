@@ -20,6 +20,9 @@ export const registerSchema = z.object({
   preferredLanguage: z
     .enum(["PUNJABI", "HINGLISH", "HINDI", "ENGLISH"])
     .default("PUNJABI"),
+  village: z.string().min(2, "Village name is required"),
+  district: z.string().min(2, "District is required"),
+  state: z.string().min(2, "State is required").default("Punjab"),
 });
 
 export type RegisterInput = z.infer<typeof registerSchema>;

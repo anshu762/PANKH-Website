@@ -40,7 +40,7 @@ export async function registerUser(data: RegisterInput) {
     return { error: "Invalid form fields. Please check your input." };
   }
 
-  const { name, email, password, phone, role, preferredLanguage } =
+  const { name, email, password, phone, role, preferredLanguage, village, district, state } =
     validated.data;
 
   try {
@@ -72,9 +72,9 @@ export async function registerUser(data: RegisterInput) {
         await tx.farmer.create({
           data: {
             userId: newUser.id,
-            village: "Default Village",
-            district: "Default District",
-            state: "Punjab",
+            village: village || "Village",
+            district: district || "District",
+            state: state || "Punjab",
           },
         });
       }
