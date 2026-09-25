@@ -26,7 +26,10 @@ export default function MarketingPage() {
               <span className="font-serif text-2xl font-bold tracking-tight text-pankh-clay">
                 {t.common.platformName}
               </span>
-              <Badge variant="outline" className="hidden sm:inline-flex text-xs font-medium border-amber-300 text-amber-950 bg-amber-50/50">
+              <Badge
+                variant="outline"
+                className="hidden sm:inline-flex text-xs font-medium border-amber-300 text-amber-950 bg-amber-50/50"
+              >
                 {t.common.tagline}
               </Badge>
             </Link>
@@ -35,11 +38,17 @@ export default function MarketingPage() {
           <nav className="flex items-center space-x-3 sm:space-x-4">
             {/* Smooth Scroll Links on Desktop */}
             <div className="hidden md:flex items-center space-x-5 text-xs font-medium text-stone-600 mr-2">
-              <a href="#how-it-works" className="hover:text-pankh-clay transition-colors">
-                Modules
+              <a
+                href="#how-it-works"
+                className="hover:text-pankh-clay transition-colors"
+              >
+                {t.marketing.modules.eyebrow}
               </a>
-              <Link href="/login" className="hover:text-pankh-clay transition-colors">
-                Vet Network
+              <Link
+                href="/login"
+                className="hover:text-pankh-clay transition-colors"
+              >
+                {t.marketing.modules.connect.badge}
               </Link>
             </div>
 
@@ -49,12 +58,19 @@ export default function MarketingPage() {
             <div className="h-4 w-px bg-border hidden sm:block" />
 
             <Link href="/login">
-              <Button variant="ghost" size="sm" className="font-medium text-xs sm:text-sm min-h-[40px]">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="font-medium text-xs sm:text-sm min-h-[40px]"
+              >
                 {t.common.login}
               </Button>
             </Link>
             <Link href="/register">
-              <Button size="sm" className="font-medium text-xs sm:text-sm bg-pankh-clay hover:bg-stone-800 text-white min-h-[40px] px-4 shadow-xs">
+              <Button
+                size="sm"
+                className="font-medium text-xs sm:text-sm bg-pankh-clay hover:bg-stone-800 text-white min-h-[40px] px-4 shadow-xs"
+              >
                 {t.common.register}
               </Button>
             </Link>

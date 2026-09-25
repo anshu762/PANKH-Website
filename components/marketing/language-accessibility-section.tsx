@@ -4,8 +4,11 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Globe, Mic2, Smartphone, WifiOff, Volume2 } from "lucide-react";
 import { SupportedLanguage } from "@/lib/i18n/types";
+import { useLanguage } from "@/hooks/use-language";
 
 export function LanguageAccessibilitySection() {
+  const { t, lang } = useLanguage();
+  const a = t.marketing.accessibility;
   const [activeDemoLang, setActiveDemoLang] = useState<SupportedLanguage>("pa");
 
   const demoAlerts: Record<
@@ -50,18 +53,24 @@ export function LanguageAccessibilitySection() {
       <div className="container mx-auto px-4 max-w-6xl">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left Column: Accessibility Features */}
-          <div className="lg:col-span-6 space-y-6">
+          <motion.div
+            key={lang}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="lg:col-span-6 space-y-6"
+          >
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-200/80 text-stone-800 text-xs font-semibold">
               <Globe className="h-3.5 w-3.5 text-stone-700" />
-              <span>Built for Dusty Hands & Sunlight</span>
+              <span>{a.badge}</span>
             </div>
 
             <h2 className="font-serif text-3xl sm:text-4xl text-pankh-clay font-normal leading-tight">
-              True Punjabi-first accessibility for real farmers in the shed.
+              {a.title}
             </h2>
 
             <p className="text-sm sm:text-base text-stone-700 font-sans leading-relaxed">
-              Most software assumes an English-speaking office worker with fast Wi-Fi. Pankh is engineered for a poultry farmer standing inside an 80-meter shed with gloves on.
+              {a.desc}
             </p>
 
             <div className="space-y-4 pt-2">
@@ -71,10 +80,10 @@ export function LanguageAccessibilitySection() {
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-pankh-clay font-sans">
-                    Punjabi & Hinglish Voice Input
+                    {a.feature1Title}
                   </h4>
                   <p className="text-xs text-stone-600 mt-0.5 leading-relaxed">
-                    Speak your daily mortality counts and symptoms directly into the microphone. Voice transcription works seamlessly with regional Punjabi accents.
+                    {a.feature1Desc}
                   </p>
                 </div>
               </div>
@@ -85,10 +94,10 @@ export function LanguageAccessibilitySection() {
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-pankh-clay font-sans">
-                    Large 48px+ Touch Targets & High Contrast
+                    {a.feature2Title}
                   </h4>
                   <p className="text-xs text-stone-600 mt-0.5 leading-relaxed">
-                    High contrast ratios ensure full readability even under direct mid-day sun, with oversized buttons for rapid one-handed tapping.
+                    {a.feature2Desc}
                   </p>
                 </div>
               </div>
@@ -99,26 +108,29 @@ export function LanguageAccessibilitySection() {
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-pankh-clay font-sans">
-                    Guaranteed Offline Draft Retention
+                    {a.feature3Title}
                   </h4>
                   <p className="text-xs text-stone-600 mt-0.5 leading-relaxed">
-                    Network drop in the rural fields? No data is ever lost. Every health log and expense entry persists locally and syncs automatically when network reconnects.
+                    {a.feature3Desc}
                   </p>
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Right Column: Interactive 4-Language Live Alert Card Demo */}
           <div className="lg:col-span-6">
             <div className="rounded-2xl border border-stone-300 bg-white p-6 sm:p-7 shadow-sm space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-stone-200">
                 <span className="text-xs font-bold uppercase tracking-wider text-stone-500">
-                  Interactive Language Preview
+                  {a.demoLabel}
                 </span>
 
                 {/* 4 Interactive Buttons */}
-                <div className="inline-flex rounded-lg bg-stone-100 p-1 border border-stone-200" role="group">
+                <div
+                  className="inline-flex rounded-lg bg-stone-100 p-1 border border-stone-200"
+                  role="group"
+                >
                   {(
                     [
                       { code: "pa", label: "ਪੰਜਾਬੀ" },
@@ -179,7 +191,7 @@ export function LanguageAccessibilitySection() {
               </AnimatePresence>
 
               <div className="text-[11px] text-stone-500 text-center font-sans">
-                Try switching languages above — Pankh renders native Punjabi script and conversational Hinglish without distorted formatting.
+                {a.demoHint}
               </div>
             </div>
           </div>

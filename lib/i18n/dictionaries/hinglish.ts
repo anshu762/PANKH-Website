@@ -18,33 +18,189 @@ export const hinglishDictionary: Dictionary = {
     accessDeniedDesc: "Aapke paas is page ko access karne ki permission nahi hai.",
   },
   marketing: {
-    badge: "Punjab Ka Pehla Poultry Intelligence Platform",
-    heroTitle: "Poultry Farmers Ki Suraksha Aur Profit Ke Liye Pankh",
-    heroSubtitle:
-      "Early disease alerts, Punjabi-first AI advice, direct vet doctor escalation, aur automated batch profit/cost tracking — Punjab ke broiler aur layer farms ke liye.",
-    heroCtaPrimary: "Shuru Karein",
-    heroCtaSecondary: "Dashboard Dekhein",
-    modulesTitle: "Chaar Core Modules",
-    modulesSubtitle:
-      "Flock livability badhane, mortality ghatane, aur behtar FCR ke liye complete farm management.",
-    modulePankhAiTitle: "Pankh AI",
-    modulePankhAiSub: "Voice Aur Text Assistant",
-    modulePankhAiDesc:
-      "Poultry se juda koi bhi sawaal Punjabi ya Hinglish mein poochein — certified knowledge base se verified answers.",
-    moduleSentinelTitle: "Pankh Sentinel",
-    moduleSentinelSub: "Early Disease Alerts",
-    moduleSentinelDesc:
-      "Daily mortality rate, feed drop, aur shed temperature par continuous monitoring ke sath early warning alerts.",
-    moduleConnectTitle: "Pankh Connect",
-    moduleConnectSub: "Vet Aur Lab Locator",
-    moduleConnectDesc:
-      "Verified poultry doctors aur diagnostic testing labs ke sath WhatsApp par 1-tap case referral.",
-    moduleEconomicsTitle: "Pankh Economics",
-    moduleEconomicsSub: "Flock Cost Aur Profit",
-    moduleEconomicsDesc:
-      "Real-time FCR calculation, feed cost tracking, aur batch profitability ka clear analysis.",
-    footerText:
-      "© 2026 Pankh Platform. Indian poultry farmers ke liye dedicated. Single shared account per farm.",
+    hero: {
+      badge: "Punjab Poultry Surveillance & Support",
+      headline: "Flock mortality badhne se pehle early disease alerts payein.",
+      subheadlineGurmukhi: "ਜਦੋਂ ਮੁਰਗੀਆਂ ਦਾਣਾ ਘੱਟ ਖਾਣ ਜਾਂ ਸੁਸਤ ਹੋਣ, ਪੰਖ ਦੱਸਦਾ ਹੈ ਕੀ ਕਰਨਾ ਹੈ।",
+      subheadline:
+        "Jab chicks feed kam khayein ya shed ka temperature bigde — Pankh AI turant advice deta hai, Sentinel disease risk detect karta hai, aur Connect aapko verified Punjab poultry doctors se connect karta hai.",
+      ctaPrimary: "Free Me Shuru Karein",
+      ctaSecondary: "Dekhein Kaise Kaam Karta Hai",
+      trustZeroFee: "Zero setup fee",
+      trustOneAccount: "1 farm ka 1 account",
+      trustOffline: "2G aur offline drafts ready",
+      sentinelActive: "Sentinel Active",
+      shedLabel: "Punjab Shed #2",
+      broilerBatch: "Broiler Batch: Day 18",
+      fcrStatus: "FCR: 1.48 (Target 1.52)",
+    },
+    problem: {
+      eyebrow: "Shed Ki Asliyat",
+      title: "Small poultry farms kismat kharab hone se nahi, balki late information ki wajah se fail hote hain.",
+      interventionPoint: "Pankh intervention point",
+      items: [
+        {
+          stat: "24 Ghante",
+          label: "Fatal detection window",
+          desc: "Sirf 2 birds marne aur 30% flock loss hone ke beech sirf 24 ghante ka fark hota hai. Water intake ka halka girna ya chicks ka huddle hona tab tak notice nahi hota jab tak mortality spike na kare.",
+        },
+        {
+          stat: "40+ km",
+          label: "Nearest poultry doctor ki doori",
+          desc: "Punjab ke rural areas me zyada tar farms ke paas koi qualified avian vet nahi hota. Bimaari aane par farmers medicine dealers ya WhatsApp groups ke guesswork par depend karte hain.",
+        },
+        {
+          stat: "₹18 – ₹22",
+          label: "Per bird hidden profit loss",
+          desc: "Daily FCR tracking aur batch cost ledgers ke bina, feed wastage aur choti bimaariyan silently margins khaa jaati hain. Farmers ko loss ka pata sirf birds sell karne ke baad chalta hai.",
+        },
+      ],
+    },
+    modules: {
+      eyebrow: "Chaar Core Modules",
+      title: "Punjab poultry shed ke daily workflow ke liye specially engineered.",
+      subtitle:
+        "Alag-alag tools nahi, balki ek integrated system jo flock livability aur farmer ke profit ko protect karta hai.",
+      coreOutputLabel: "Core Farmer Output",
+      ai: {
+        badge: "Pankh AI • Voice & Text",
+        pill: "Gurmukhi + Hinglish",
+        title: "Flock symptoms apni bhasha me bolein. Certified vet guidance payein.",
+        desc: "ICAR aur GADVASU poultry protocols par trained. Kabhi bhi mann-ghadant medicine names suggest nahi karta.",
+        output: "Strict 6-step response (Answer → Why → What to do → Ask → Escalate → Source) actionable first-aid ke sath.",
+        bullet1: "Shed me hands-free voice input se quick logging karein",
+        bullet2: "Zero fake prescriptions — certified scientific sources only",
+      },
+      sentinel: {
+        badge: "Pankh Sentinel • Early Warning",
+        pill: "Tri-Signal",
+        title: "Outbreak spread hone se pehle daily mortality aur feed intake par monitoring.",
+        desc: "Sentinel daily mortality, feed drop, aur shed weather curves ko compare karta hai. Agar numbers abnormal hon, to alert turant bajta hai.",
+        output: "Daily Risk Classification (Normal / Watch / Urgent) un specific signals ke sath jinhone alert trigger kiya.",
+        bullet1: "Automatic feed drop triggers (>15% drop par immediate investigation alert)",
+        bullet2: "Heat stress aur humidity ka OpenWeather ke sath real-time analysis",
+      },
+      connect: {
+        badge: "Pankh Connect • Vet & Lab Bridge",
+        pill: "Punjab District Locator",
+        title: "Registered poultry veterinarians aur testing labs se direct escalation.",
+        desc: "Jab red-flag condition detect hoti hai, Pankh farmer ko Ludhiana, Hoshiarpur, Sangrur etc. districts ke verified doctors se connect karta hai.",
+        output: "1-tap WhatsApp Case Package: Symptoms summary, photo/audio logs, age, aur GPS location doctor ko direct share hoti hai.",
+        bullet1: "Verified doctor degrees aur district distance ke according filter",
+        bullet2: "Data share karne se pehle farmer ki clear permission compulsory",
+      },
+      economics: {
+        badge: "Pankh Economics • Batch Ledger",
+        pill: "Live FCR & ₹/Bird",
+        title: "Lifting day se pehle hi apni bird cost aur batch profit jaanein.",
+        desc: "Chicks purchase, pre-starter/finisher feed bags, medicines, aur mortality cost ka clear hisaab. Incomplete data par explicit assumptions show hote hain.",
+        output: "Real-time Feed Conversion Ratio (FCR), net cost per kg live weight, aur break-even price.",
+        bullet1: "Hard data aur assumptions ke beech clear clarity (e.g. assuming ₹X/bird)",
+        bullet2: "Farm owner aur shed supervisor ke liye single shared account",
+      },
+    },
+    howAiAnswers: {
+      eyebrow: "Rigorous Response Architecture",
+      title: "Pankh AI kaise answer karta hai — deterministic, structured, verified.",
+      subtitle:
+        "Har health answer ek fixed 6-step protocol follow karta hai. Koi random chat nahi, koi guess nahi.",
+      questionContext: "Real Farmer Voice Query (Sangrur District)",
+      questionText:
+        "“Bhai, 4 din ke broiler chicks hain, corner me ikkattha ho rahe hain aur daana kam kha rahe hain. Kya antibiotic de dein?”",
+      step1: {
+        name: "Answer",
+        title: "Direct Immediate Assessment",
+        badge: "No Generic Chat",
+        text: "Antibiotic bilkul mat dijiye. Chicks ka corner me huddle hona aur feed drop hona thand lagne (temperature stress) ka typical pattern hai, kisi bacterial infection ka nahi.",
+      },
+      step2: {
+        name: "Why",
+        title: "Biological Reasons",
+        badge: "1-3 Plain Bullets",
+        bullets: [
+          "Week 1 ke dauran broiler chicks apna body temperature khud maintain nahi kar pate.",
+          "Corner me jama hona saaf batata hai ki shed ka brooding temperature 32°C se niche gir gaya hai.",
+          "Thand ki wajah se unka gizzard digestion slow ho jata hai, isliye chicks feed khana chhod dete hain.",
+        ],
+      },
+      step3: {
+        name: "What to do now",
+        title: "Immediate Physical Actions",
+        badge: "Actionable First-Aid",
+        bullets: [
+          "Brooder lamp ki height kam karein aur chick level par temperature 33°C – 34°C ensure karein.",
+          "Direct thandi hawa rokne ke liye bahar ke curtains ko 70% close karein, par cross-ventilation band na karein.",
+          "Chicks ki body energy recover karne ke liye agle 6 ghante drinker me Electrolyte + 5% Glucose dein.",
+        ],
+      },
+      step4: {
+        name: "Ask",
+        title: "Diagnostic Follow-up",
+        badge: "Only If Needed",
+        text: "“Kya chicks lagatar tezz chirping ki awaaz nikal rahe hain? Aur unka litter material dry hai ya geela feel ho raha hai?”",
+      },
+      step5: {
+        name: "Escalate",
+        title: "Deterministic Red-Flag Gate",
+        badge: "Veterinary Rule Layer",
+        text: "RED FLAG RULE: Agar temperature set karne ke 6 ghante baad bhi mortality 5 birds se zyada ho ya gasping (munh khol ke saans lena) dekhein, to Pankh Connect se turant nearby vet ko case share karein.",
+      },
+      step6: {
+        name: "Source",
+        title: "Verifiable Citation",
+        badge: "Retrieved, Never Invented",
+        text: "Based on: GADVASU Poultry Brooding Protocol & ICAR Broiler Management Manual (v2.4)",
+      },
+    },
+    safety: {
+      badge: "Non-Negotiable Safety Rule",
+      quote:
+        "“AI kabhi diagnosis confirm nahi karta — sirf risk patterns aur first-aid guidance deta hai, aur zaroorat padne par vet se connect karta hai.”",
+      desc: "Hum jaante hain ki poultry farming ek high-risk live animal business hai jahan ek galat dawa pure flock ko damage kar sakti hai. Isliye Pankh clinical boundaries par bana hai.",
+      pillar1Title: "Zero Autonomous Diagnosis",
+      pillar1Desc:
+        "AI me coded hai ki wo kabhi bimaari confirm na kare. Wo sirf risk patterns (Normal / Watch / Urgent) classify karta hai.",
+      pillar2Title: "Pre-LLM Red Flag Gate",
+      pillar2Desc:
+        "Emergency symptoms AI model tak pahunchne se pehle deterministic code rules se pakde jaate hain aur vet referral trigger karte hain.",
+      pillar3Title: "RAG Verification Only",
+      pillar3Desc:
+        "Health advice kabhi raw LLM memory se generate nahi hoti. Sirf GADVASU aur ICAR knowledge base ke verified chunks use hote hain.",
+    },
+    accessibility: {
+      badge: "Mitti Wale Haathon Aur Dhoop Ke Liye",
+      title: "Shed me khade real farmers ke liye true Punjabi-first accessibility.",
+      desc: "Zyada tar software AC office worker ke liye bante hain. Pankh 80-meter lambe shed me gloves pehan kar khade poultry farmer ke liye design hua hai.",
+      feature1Title: "Punjabi Aur Hinglish Voice Input",
+      feature1Desc:
+        "Apni daily mortality aur symptoms microphone me bolein. Voice transcription regional Punjabi accents ke sath smoothly kaam karta hai.",
+      feature2Title: "Large 48px+ Touch Buttons Aur High Contrast",
+      feature2Desc:
+        "Dopahar ki tez dhoop me bhi screen clearly visible rehti hai, aur bade buttons one-hand tapping ke liye comfortable hain.",
+      feature3Title: "Offline Draft Retention Guaranteed",
+      feature3Desc:
+        "Fields me network drop ho gaya? Koi data loss nahi hota. Har log aur expense phone me save rehta hai aur internet aane par auto-sync ho jata hai.",
+      demoLabel: "Live Language Preview",
+      demoHint:
+        "Upar language badal kar dekhein — Pankh regional scripts aur conversational Hinglish bina kisi formatting issue ke render karta hai.",
+    },
+    footer: {
+      desc: "Punjabi-first poultry farm support platform — Pankh AI, Sentinel disease alerts, vet escalation, aur batch economics ka complete system.",
+      modulesColTitle: "Platform Modules",
+      farmerColTitle: "Farmer Access",
+      moduleAi: "Pankh AI (Voice Assistant)",
+      moduleSentinel: "Pankh Sentinel (Disease Alerts)",
+      moduleConnect: "Pankh Connect (Vet & Lab Network)",
+      moduleEconomics: "Pankh Economics (Batch Ledgers)",
+      farmerLogin: "Farmer Login",
+      createAccount: "Naya Farm Account Banayein",
+      vetPortal: "Doctor Aur Lab Portal",
+      disclaimer:
+        "© 2026 Pankh Platform. Non-diagnostic advisory tool. Clinical treatment ke liye hamesha registered poultry vet se consult karein.",
+      creditPre: "Crafted with precision by",
+      creditAuthor: "Anubhav Singh",
+      creditPost: "• Grounded in Punjab poultry farm realities.",
+    },
   },
   auth: {
     loginTitle: "Pankh Mein Login Karein",
