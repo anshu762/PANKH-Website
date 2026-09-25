@@ -1,0 +1,365 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  FARMER
+  VET
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum PreferredLanguage {
+  PUNJABI
+  HINGLISH
+  HINDI
+  ENGLISH
+}
+
+enum ProductionType {
+  BROILER
+  LAYER
+}
+
+enum BatchStatus {
+  ACTIVE
+  CLOSED
+}
+
+enum MediaType {
+  PHOTO
+  AUDIO
+}
+
+enum AnalysisStatus {
+  PENDING
+  DONE
+  FAILED
+}
+
+enum AlertSeverity {
+  GREEN
+  AMBER
+  RED
+}
+
+enum CaseStatus {
+  CREATED
+  CONTACTED
+  APPOINTMENT
+  ADVICE_RECEIVED
+  RESOLVED
+}
+
+enum TransactionType {
+  EXPENSE
+  REVENUE
+}
+
+enum VetLabType {
+  VET
+  LAB
+  ASSOCIATION
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+}
+
+enum InputMode {
+  TEXT
+  VOICE
+  PHOTO
+}
+
+model User {
+  id                String            @id @default(cuid())
+  email             String            @unique
+  passwordHash      String
+  name              String?
+  role              Role              @default(FARMER)
+  phone             String?
+  preferredLanguage PreferredLanguage @default(PUNJABI)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  farmer    Farmer?
+  auditLogs AuditLog[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Farmer {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  village           String
+  district          String
+  state             String
+  consentDataShare  Boolean  @default(false)
+  consentMediaShare Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  farms         Farm[]
+  caseRecords   CaseRecord[]
+  conversations Conversation[]
+
+  @@index([district, state])
+}
+
+model Farm {
+  id              String   @id @default(cuid())
+  farmerId        String
+  farmer          Farmer   @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+  name            String
+  latitude        Float?
+  longitude       Float?
+  farmType        String
+  capacity        Int
+  shedCount       Int
+  ventilationType String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  batches Batch[]
+
+  @@index([farmerId])
+}
+
+model Batch {
+  id             String         @id @default(cuid())
+  farmId         String
+  farm           Farm           @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  birdType       String
+  breed          String
+  productionType ProductionType
+  placementDate  DateTime
+  startingBirds  Int
+  currentBirds   Int
+  status         BatchStatus    @default(ACTIVE)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  dailyLogs    DailyHealthLog[]
+  media        Media[]
+  alerts       Alert[]
+  caseRecords  CaseRecord[]
+  transactions Transaction[]
+
+  @@index([farmId])
+  @@index([status])
+}
+
+model DailyHealthLog {
+  id          String   @id @default(cuid())
+  batchId     String
+  batch       Batch    @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  date        DateTime
+  mortality   Int
+  feedKg      Float?
+  waterLitres Float?
+  eggCount    Int?
+  symptoms    String[]
+  shedTemp    Float?
+  humidity    Float?
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  media Media[]
+
+  @@index([batchId, date])
+}
+
+model Media {
+  id             String          @id @default(cuid())
+  batchId        String
+  batch          Batch           @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  url            String
+  type           MediaType
+  linkedLogId    String?
+  linkedLog      DailyHealthLog? @relation(fields: [linkedLogId], references: [id], onDelete: SetNull)
+  uploadedBy     String
+  analysisStatus AnalysisStatus  @default(PENDING)
+  createdAt      DateTime        @default(now())
+
+  @@index([batchId])
+  @@index([linkedLogId])
+}
+
+model Alert {
+  id               String        @id @default(cuid())
+  batchId          String
+  batch            Batch         @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  severity         AlertSeverity
+  reason           String
+  signalsTriggered Json
+  acknowledged     Boolean       @default(false)
+  escalated        Boolean       @default(false)
+  createdAt        DateTime      @default(now())
+
+  caseRecords CaseRecord[]
+
+  @@index([batchId, severity])
+  @@index([createdAt])
+}
+
+model CaseRecord {
+  id              String      @id @default(cuid())
+  farmerId        String
+  farmer          Farmer      @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+  batchId         String
+  batch           Batch       @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  alertId         String?
+  alert           Alert?      @relation(fields: [alertId], references: [id], onDelete: SetNull)
+  symptomsSummary String
+  aiSummary       String?
+  assignedVetLabId String?
+  assignedVetLab  VetLab?     @relation(fields: [assignedVetLabId], references: [id], onDelete: SetNull)
+  status          CaseStatus  @default(CREATED)
+  consentGiven    Boolean     @default(false)
+  createdAt       DateTime    @default(now())
+
+  @@index([farmerId])
+  @@index([batchId])
+  @@index([status])
+}
+
+model Transaction {
+  id        String          @id @default(cuid())
+  batchId   String
+  batch     Batch           @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  type      TransactionType
+  category  String
+  amount    Decimal         @db.Decimal(12, 2)
+  quantity  Float?
+  unit      String?
+  note      String?
+  date      DateTime
+  createdAt DateTime        @default(now())
+
+  @@index([batchId, date])
+  @@index([batchId, type])
+}
+
+model KnowledgeSource {
+  id        String   @id @default(cuid())
+  title     String
+  authority String
+  topic     String
+  language  String
+  version   String
+  url       String?
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  chunks KnowledgeChunk[]
+}
+
+model KnowledgeChunk {
+  id          String                                  @id @default(cuid())
+  sourceId    String
+  source      KnowledgeSource                         @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  content     String                                  @db.Text
+  embedding   Unsupported("vector(1536)")?
+  birdType    String?
+  ageRangeMin Int?
+  ageRangeMax Int?
+  region      String?
+  tags        String[]
+
+  @@index([sourceId])
+}
+
+model VetLab {
+  id              String     @id @default(cuid())
+  name            String
+  type            VetLabType
+  qualification   String?
+  verified        Boolean    @default(false)
+  phone           String
+  whatsapp        String?
+  address         String
+  latitude        Float?
+  longitude       Float?
+  serviceRadiusKm Float?
+  specializations String[]
+  languages       String[]
+  teleconsult     Boolean    @default(false)
+  hours           String?
+  createdAt       DateTime   @default(now())
+
+  caseRecords CaseRecord[]
+
+  @@index([type, verified])
+}
+
+model Conversation {
+  id        String    @id @default(cuid())
+  farmerId  String
+  farmer    Farmer    @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+
+  messages Message[]
+
+  @@index([farmerId])
+}
+
+model Message {
+  id             String      @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           MessageRole
+  content        String      @db.Text
+  inputMode      InputMode   @default(TEXT)
+  sourceIds      String[]
+  createdAt      DateTime    @default(now())
+
+  @@index([conversationId, createdAt])
+}
+
+model AlertRule {
+  id             String             @id @default(cuid())
+  name           String
+  thresholdKey   String             @unique
+  thresholdValue Float
+  editable       Boolean            @default(true)
+  updatedBy      String
+  updatedAt      DateTime           @updatedAt
+
+  history AlertRuleHistory[]
+}
+
+model AlertRuleHistory {
+  id            String    @id @default(cuid())
+  ruleId        String
+  rule          AlertRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  previousValue Float
+  newValue      Float
+  changedBy     String
+  changedAt     DateTime  @default(now())
+
+  @@index([ruleId])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action     String
+  entityType String
+  entityId   String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([actorId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
