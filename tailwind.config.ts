@@ -9,6 +9,11 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        serif: ["var(--font-fraunces)", "Georgia", "serif"],
+        sans: ["var(--font-manrope)", "var(--font-gurmukhi)", "sans-serif"],
+        gurmukhi: ["var(--font-gurmukhi)", "sans-serif"],
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
@@ -43,12 +48,21 @@ const config: Config = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        chart: {
-          "1": "hsl(var(--chart-1))",
-          "2": "hsl(var(--chart-2))",
-          "3": "hsl(var(--chart-3))",
-          "4": "hsl(var(--chart-4))",
-          "5": "hsl(var(--chart-5))",
+        // Punjab Agrarian Brand Tokens
+        pankh: {
+          paper: "#FBFBF9",
+          clay: "#18181B",
+          marigold: "#D97706",
+          "marigold-light": "#FEF3C7",
+          mustard: "#EAB308",
+          phulkari: "#EA580C",
+          "phulkari-light": "#FFEDD5",
+          indigo: "#1E1B4B",
+          "indigo-light": "#EEF2FF",
+          canal: "#0284C7",
+          "sentinel-green": "#059669",
+          "sentinel-amber": "#D97706",
+          "sentinel-red": "#DC2626",
         },
       },
       borderRadius: {
