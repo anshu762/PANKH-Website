@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Globe, Mic2, Smartphone, WifiOff, Volume2 } from "lucide-react";
 import { SupportedLanguage } from "@/lib/i18n/types";
@@ -9,7 +9,11 @@ import { useLanguage } from "@/hooks/use-language";
 export function LanguageAccessibilitySection() {
   const { t, lang } = useLanguage();
   const a = t.marketing.accessibility;
-  const [activeDemoLang, setActiveDemoLang] = useState<SupportedLanguage>("pa");
+  const [activeDemoLang, setActiveDemoLang] = useState<SupportedLanguage>(lang);
+
+  useEffect(() => {
+    setActiveDemoLang(lang);
+  }, [lang]);
 
   const demoAlerts: Record<
     SupportedLanguage,
@@ -143,10 +147,10 @@ export function LanguageAccessibilitySection() {
                       key={opt.code}
                       type="button"
                       onClick={() => setActiveDemoLang(opt.code)}
-                      className={`px-2.5 py-1 text-xs rounded-md font-medium transition-all min-h-[36px] ${
+                      className={`px-3 py-1 text-xs rounded-md font-medium transition-all min-h-[36px] ${
                         activeDemoLang === opt.code
-                          ? "bg-white text-pankh-clay font-semibold shadow-xs"
-                          : "text-stone-600 hover:text-stone-900"
+                          ? "bg-primary text-primary-foreground font-bold shadow-xs"
+                          : "text-stone-600 hover:text-stone-900 hover:bg-stone-200/60"
                       }`}
                     >
                       {opt.label}

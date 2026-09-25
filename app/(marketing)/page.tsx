@@ -57,7 +57,7 @@ export default function MarketingPage() {
 
             <div className="h-4 w-px bg-border hidden sm:block" />
 
-            <Link href="/login">
+            <Link href="/login" className="hidden sm:inline-flex">
               <Button
                 variant="ghost"
                 size="sm"

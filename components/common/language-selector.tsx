@@ -12,6 +12,20 @@ interface LanguageSelectorProps {
   className?: string;
 }
 
+interface LanguageOption {
+  code: SupportedLanguage;
+  label: string;
+  mobileLabel: string;
+  nativeName: string;
+}
+
+const LANGUAGE_OPTIONS: LanguageOption[] = [
+  { code: "pa", label: "ਪੰਜਾਬੀ", mobileLabel: "ਪੰਜਾਬੀ", nativeName: "ਪੰਜਾਬੀ (Gurmukhi)" },
+  { code: "en", label: "English", mobileLabel: "EN", nativeName: "English" },
+  { code: "hi", label: "हिन्दी", mobileLabel: "हिन्दी", nativeName: "हिन्दी (Hindi)" },
+  { code: "hinglish", label: "Hinglish", mobileLabel: "Hing", nativeName: "Hinglish" },
+];
+
 export function LanguageSelector({
   variant = "pill",
   className,
@@ -38,23 +52,18 @@ export function LanguageSelector({
     };
   }, [isOpen]);
 
-  // Pill Switch (Punjabi / English instant 1-tap toggle + more options)
+  // Pill Switch - Direct 1-tap access to all 4 languages with animated orange indicator
   if (variant === "pill") {
-    const quickOptions: { code: SupportedLanguage; label: string }[] = [
-      { code: "pa", label: "ਪੰਜਾਬੀ" },
-      { code: "en", label: "English" },
-    ];
-
     return (
       <div
         className={cn(
-          "inline-flex items-center p-1 rounded-full bg-muted/80 border border-border/60 text-xs font-medium backdrop-blur-sm shadow-sm",
+          "inline-flex items-center p-0.5 sm:p-1 rounded-full bg-stone-100/90 border border-stone-200/80 text-xs font-medium backdrop-blur-sm shadow-xs",
           className
         )}
         role="group"
         aria-label="Language selection"
       >
-        {quickOptions.map((opt) => {
+        {LANGUAGE_OPTIONS.map((opt) => {
           const isActive = lang === opt.code;
           return (
             <button
@@ -62,82 +71,41 @@ export function LanguageSelector({
               type="button"
               onClick={() => setLanguage(opt.code)}
               className={cn(
-                "relative px-3 py-1 rounded-full transition-colors font-medium z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                "relative px-2.5 sm:px-3 py-1 rounded-full transition-colors text-xs z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary whitespace-nowrap",
                 isActive
-                  ? "text-primary-foreground font-semibold"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "text-primary-foreground font-bold"
+                  : "text-stone-600 hover:text-stone-900 font-medium"
               )}
+              title={opt.label}
+              aria-pressed={isActive}
             >
               {isActive && (
                 <motion.div
                   layoutId="activeLangPill"
-                  className="absolute inset-0 bg-primary rounded-full -z-10 shadow-sm"
-                  transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                  className="absolute inset-0 bg-primary rounded-full -z-10 shadow-xs"
+                  transition={{ type: "spring", stiffness: 450, damping: 32 }}
                 />
               )}
-              {opt.label}
+              <span className="hidden sm:inline">{opt.label}</span>
+              <span className="sm:hidden">{opt.mobileLabel}</span>
             </button>
           );
         })}
-
-        {/* Extended Dropdown button for Hindi & Hinglish */}
-        <div className="relative ml-0.5" ref={dropdownRef}>
-          <button
-            type="button"
-            onClick={() => setIsOpen(!isOpen)}
-            className={cn(
-              "p-1.5 rounded-full text-muted-foreground hover:text-foreground transition-colors hover:bg-background/60",
-              (lang === "hi" || lang === "hinglish") &&
-                "text-primary font-semibold"
-            )}
-            title="More languages"
-            aria-label="More languages"
-            aria-expanded={isOpen}
-          >
-            <ChevronDown className="h-3.5 w-3.5" />
-          </button>
-
-          <AnimatePresence>
-            {isOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: 6, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 4, scale: 0.95 }}
-                transition={{ duration: 0.15 }}
-                className="absolute right-0 mt-2 w-40 rounded-xl bg-card border border-border shadow-lg p-1.5 z-50 text-xs"
-              >
-                {supportedLanguages.map((item) => {
-                  const isSelected = lang === item.code;
-                  return (
-                    <button
-                      key={item.code}
-                      type="button"
-                      onClick={() => {
-                        setLanguage(item.code);
-                        setIsOpen(false);
-                      }}
-                      className={cn(
-                        "w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left transition-colors",
-                        isSelected
-                          ? "bg-primary/10 text-primary font-semibold"
-                          : "text-foreground hover:bg-muted"
-                      )}
-                    >
-                      <span>{item.nativeName}</span>
-                      {isSelected && <Check className="h-3.5 w-3.5 text-primary" />}
-                    </button>
-                  );
-                })}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
       </div>
     );
   }
 
-  // Compact Pill (pa / en badge)
+  // Compact Pill (cycles through languages on tap)
   if (variant === "compact") {
+    const currentOpt =
+      LANGUAGE_OPTIONS.find((o) => o.code === lang) || LANGUAGE_OPTIONS[0];
+
+    const cycleLanguage = () => {
+      const currentIndex = LANGUAGE_OPTIONS.findIndex((o) => o.code === lang);
+      const nextIndex = (currentIndex + 1) % LANGUAGE_OPTIONS.length;
+      setLanguage(LANGUAGE_OPTIONS[nextIndex].code);
+    };
+
     return (
       <div
         className={cn(
@@ -147,29 +115,32 @@ export function LanguageSelector({
       >
         <button
           type="button"
-          onClick={() => setLanguage(lang === "pa" ? "en" : "pa")}
-          className="flex items-center gap-1 px-2.5 py-1 rounded-full text-foreground hover:text-primary transition-colors font-medium"
+          onClick={cycleLanguage}
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-foreground hover:text-primary transition-colors font-medium"
+          title="Switch language"
         >
-          <Globe className="h-3 w-3 text-muted-foreground" />
-          <span>{lang === "pa" ? "English" : "ਪੰਜਾਬੀ"}</span>
+          <Globe className="h-3 w-3 text-primary" />
+          <span className="font-semibold text-primary">{currentOpt.label}</span>
         </button>
       </div>
     );
   }
 
   // Full Dropdown Menu Variant
-  const currentLangInfo = supportedLanguages.find((item) => item.code === lang);
+  const currentLangInfo =
+    supportedLanguages.find((item) => item.code === lang) ||
+    supportedLanguages[0];
 
   return (
     <div className={cn("relative inline-block", className)} ref={dropdownRef}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-input bg-background/80 hover:bg-accent hover:text-accent-foreground text-xs font-medium transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-input bg-background/80 hover:bg-accent hover:text-accent-foreground text-xs font-medium transition-colors shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         aria-expanded={isOpen}
       >
-        <Globe className="h-3.5 w-3.5 text-muted-foreground" />
-        <span>{currentLangInfo?.nativeName || "ਪੰਜਾਬੀ"}</span>
+        <Globe className="h-3.5 w-3.5 text-primary" />
+        <span className="font-semibold">{currentLangInfo.nativeName}</span>
         <ChevronDown className="h-3 w-3 text-muted-foreground" />
       </button>
 
@@ -180,12 +151,12 @@ export function LanguageSelector({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 4, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 mt-2 w-44 rounded-xl bg-card border border-border shadow-lg p-1.5 z-50 text-xs"
+            className="absolute right-0 mt-2 w-48 rounded-xl bg-card border border-border shadow-lg p-1.5 z-50 text-xs"
           >
             <div className="px-2 py-1 text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
               Select Language / ਭਾਸ਼ਾ
             </div>
-            {supportedLanguages.map((item) => {
+            {LANGUAGE_OPTIONS.map((item) => {
               const isSelected = lang === item.code;
               return (
                 <button
@@ -198,14 +169,14 @@ export function LanguageSelector({
                   className={cn(
                     "w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition-colors",
                     isSelected
-                      ? "bg-primary/10 text-primary font-semibold"
+                      ? "bg-primary/10 text-primary font-bold"
                       : "text-foreground hover:bg-muted"
                   )}
                 >
                   <div className="flex flex-col">
-                    <span className="font-medium">{item.nativeName}</span>
+                    <span className="font-medium">{item.label}</span>
                     <span className="text-[10px] text-muted-foreground">
-                      {item.name}
+                      {item.nativeName}
                     </span>
                   </div>
                   {isSelected && <Check className="h-3.5 w-3.5 text-primary" />}
