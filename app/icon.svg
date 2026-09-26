@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="pankh-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="50%" stop-color="#D97706" />
+      <stop offset="100%" stop-color="#B45309" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="1" stdDeviation="0.8" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <!-- Golden Agrarian Rounded Base -->
+  <rect width="32" height="32" rx="8" fill="url(#pankh-grad)" />
+  <rect width="30" height="30" x="1" y="1" rx="7" fill="none" stroke="#FEF3C7" stroke-width="0.8" stroke-opacity="0.6" />
+
+  <!-- Gurmukhi 'ਪੰ' (Pan) Symbol with High-Contrast White Fill -->
+  <text 
+    x="16" 
+    y="23" 
+    font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans Gurmukhi', 'Mukta Mahee', sans-serif" 
+    font-size="19" 
+    font-weight="900" 
+    fill="#FFFFFF" 
+    text-anchor="middle"
+    filter="url(#shadow)"
+  >ਪੰ</text>
+
+  <!-- Subtle Feather Quill Glow Accent at bottom right -->
+  <path d="M23 25 C25 24, 27 21, 28 17 C26 19, 24 21, 23 25 Z" fill="#FEF3C7" opacity="0.75" />
+</svg>
