@@ -62,10 +62,22 @@ export async function getFarmerDashboardData() {
         orderBy: { createdAt: "desc" },
       });
 
-      // Fetch latest sentinel alert
+      // Fetch latest sentinel alerts
       latestAlert = await prisma.alert.findFirst({
         where: { batchId: activeBatch.id },
         orderBy: { createdAt: "desc" },
+      });
+
+      const recentAlerts = await prisma.alert.findMany({
+        where: { batchId: activeBatch.id },
+        orderBy: { createdAt: "desc" },
+        take: 3,
+      });
+
+      const recentLogs = await prisma.dailyHealthLog.findMany({
+        where: { batchId: activeBatch.id },
+        orderBy: { createdAt: "desc" },
+        take: 5,
       });
 
       // Sum transactions
@@ -79,6 +91,61 @@ export async function getFarmerDashboardData() {
         if (tx.type === "EXPENSE") totalSpend += num;
         if (tx.type === "REVENUE") totalRevenue += num;
       }
+
+      // Calculate flock cycle
+      let flockDay = 1;
+      if (activeBatch.placementDate) {
+        const placed = new Date(activeBatch.placementDate);
+        const now = new Date();
+        const diffDays = Math.floor(
+          (now.getTime() - placed.getTime()) / (1000 * 60 * 60 * 24)
+        );
+        flockDay = Math.max(1, diffDays + 1);
+      }
+
+      const livability =
+        activeBatch.startingBirds > 0
+          ? Number(
+              ((activeBatch.currentBirds / activeBatch.startingBirds) * 100).toFixed(1)
+            )
+          : 100.0;
+
+      return {
+        success: true,
+        needsOnboarding: false,
+        farmer,
+        farm: activeFarm,
+        batch: activeBatch,
+        todayLog,
+        latestAlert,
+        recentAlerts,
+        recentLogs,
+        flockCycle: {
+          day: flockDay,
+          targetDays: activeBatch.productionType === "BROILER" ? 42 : 72,
+          livability,
+          progressPercent: Math.min(
+            100,
+            Math.round((flockDay / (activeBatch.productionType === "BROILER" ? 42 : 72)) * 100)
+          ),
+        },
+        weather: {
+          temp: 34,
+          condition: "Sunny / ਸਾਫ਼ ਧੁੱਪ",
+          humidity: 46,
+          heatRisk: "MODERATE" as const,
+          recommendation: "Keep roof sprinklers and foggers active from 11:30 AM to 4:30 PM",
+        },
+        economics: {
+          totalSpend,
+          totalRevenue,
+          netMargin: totalRevenue - totalSpend,
+          estimatedCostPerBird:
+            activeBatch.currentBirds > 0
+              ? Math.round(totalSpend / activeBatch.currentBirds)
+              : 0,
+        },
+      };
     }
 
     return {
@@ -86,13 +153,24 @@ export async function getFarmerDashboardData() {
       needsOnboarding: false,
       farmer,
       farm: activeFarm,
-      batch: activeBatch,
-      todayLog,
-      latestAlert,
+      batch: null,
+      todayLog: null,
+      latestAlert: null,
+      recentAlerts: [],
+      recentLogs: [],
+      flockCycle: null,
+      weather: {
+        temp: 32,
+        condition: "Clear",
+        humidity: 50,
+        heatRisk: "LOW" as const,
+        recommendation: "Normal ambient ventilation",
+      },
       economics: {
-        totalSpend,
-        totalRevenue,
-        netMargin: totalRevenue - totalSpend,
+        totalSpend: 0,
+        totalRevenue: 0,
+        netMargin: 0,
+        estimatedCostPerBird: 0,
       },
     };
   } catch (error) {

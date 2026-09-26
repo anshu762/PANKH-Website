@@ -22,6 +22,10 @@ export default async function FarmerDashboardPage() {
       batch={data.batch}
       todayLog={data.todayLog}
       latestAlert={data.latestAlert}
+      recentAlerts={data.recentAlerts || []}
+      recentLogs={data.recentLogs || []}
+      flockCycle={data.flockCycle}
+      weather={data.weather}
       economics={data.economics!}
     />
   );
