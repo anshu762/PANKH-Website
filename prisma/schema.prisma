@@ -320,6 +320,7 @@ model Message {
   content        String      @db.Text
   inputMode      InputMode   @default(TEXT)
   sourceIds      String[]
+  feedback       String?
   createdAt      DateTime    @default(now())
 
   @@index([conversationId, createdAt])
