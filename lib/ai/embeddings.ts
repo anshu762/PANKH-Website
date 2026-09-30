@@ -5,6 +5,8 @@
  * fallback when API keys are unconfigured.
  */
 
+import { prisma } from "../db";
+
 export const EMBEDDING_DIMENSION = 1536;
 
 /**
@@ -148,4 +150,36 @@ export async function getEmbedding(text: string): Promise<number[]> {
 
   // Deterministic local projection
   return generateDeterministicEmbedding(text);
+}
+
+/**
+ * Re-indexes a single KnowledgeChunk by generating its 1536-dimensional embedding
+ * and storing it into the pgvector column.
+ */
+export async function reindexKnowledgeChunk(chunkId: string, content: string): Promise<void> {
+  const embedding = await getEmbedding(content);
+  const vecString = `[${embedding.join(",")}]`;
+
+  await prisma.$executeRawUnsafe(
+    `UPDATE "KnowledgeChunk" SET "embedding" = $1::vector WHERE "id" = $2`,
+    vecString,
+    chunkId
+  );
+}
+
+/**
+ * Re-indexes all chunks for a given KnowledgeSource.
+ * Called when an admin creates, updates, or approves a KnowledgeSource.
+ */
+export async function reindexSourceChunks(sourceId: string): Promise<number> {
+  const chunks = await prisma.knowledgeChunk.findMany({
+    where: { sourceId },
+    select: { id: true, content: true },
+  });
+
+  for (const chunk of chunks) {
+    await reindexKnowledgeChunk(chunk.id, chunk.content);
+  }
+
+  return chunks.length;
 }

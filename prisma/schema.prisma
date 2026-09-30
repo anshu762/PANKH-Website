@@ -105,6 +105,7 @@ model Farmer {
   state             String
   consentDataShare  Boolean  @default(false)
   consentMediaShare Boolean  @default(false)
+  adminNotes        String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
@@ -203,6 +204,7 @@ model Alert {
   signalsTriggered Json
   acknowledged     Boolean       @default(false)
   escalated        Boolean       @default(false)
+  adminNotes       String?
   createdAt        DateTime      @default(now())
 
   caseRecords CaseRecord[]
@@ -363,4 +365,15 @@ model AuditLog {
   @@index([actorId])
   @@index([entityType, entityId])
   @@index([createdAt])
+}
+
+model EventLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  eventType String
+  metadata  Json?
+  timestamp DateTime @default(now())
+
+  @@index([eventType, timestamp])
+  @@index([userId, timestamp])
 }

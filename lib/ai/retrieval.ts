@@ -148,3 +148,6 @@ async function fallbackKeywordRetrieval(
     similarity: 0.75,
   }));
 }
+
+export const retrieveKnowledgeChunks = retrieveKnowledge;
+
