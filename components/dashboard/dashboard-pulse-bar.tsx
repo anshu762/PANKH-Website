@@ -15,16 +15,30 @@ interface DashboardPulseBarProps {
     recommendation: string;
   };
   todayLog?: any;
+  latestAlert?: any;
+  recentLogs?: any[];
 }
 
 export function DashboardPulseBar({
   weather,
   todayLog,
+  latestAlert,
+  recentLogs = [],
 }: DashboardPulseBarProps) {
   const { t } = useLanguage();
   const d = t.dashboardHome;
 
   const isCheckedIn = Boolean(todayLog);
+  const severity = latestAlert?.severity || "GREEN";
+
+  const lastLog = todayLog || (recentLogs && recentLogs[0]) || null;
+  const lastCheckinFormatted = lastLog
+    ? new Date(lastLog.date || lastLog.createdAt).toLocaleTimeString("en-IN", {
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: "Asia/Kolkata",
+      })
+    : null;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-4 items-stretch">
@@ -66,7 +80,11 @@ export function DashboardPulseBar({
       <div
         className={cn(
           "md:col-span-5 rounded-2xl border p-4 sm:p-4.5 shadow-xs flex items-center justify-between gap-3 transition-colors",
-          isCheckedIn
+          severity === "RED"
+            ? "bg-red-50/80 border-red-300 text-red-950"
+            : severity === "AMBER"
+            ? "bg-amber-50/80 border-amber-300 text-amber-950"
+            : isCheckedIn
             ? "bg-emerald-50/70 border-emerald-300/80 text-emerald-950"
             : "bg-amber-50/80 border-amber-300/80 text-amber-950"
         )}
@@ -75,12 +93,18 @@ export function DashboardPulseBar({
           <div
             className={cn(
               "h-10 w-10 rounded-xl flex items-center justify-center shrink-0 border",
-              isCheckedIn
+              severity === "RED"
+                ? "bg-red-100 border-red-300 text-red-800"
+                : severity === "AMBER"
+                ? "bg-amber-100 border-amber-300 text-amber-800"
+                : isCheckedIn
                 ? "bg-emerald-100/80 border-emerald-300 text-emerald-800"
                 : "bg-amber-100/90 border-amber-300 text-amber-800"
             )}
           >
-            {isCheckedIn ? (
+            {severity === "RED" ? (
+              <AlertCircle className="h-5 w-5 text-red-700 animate-pulse" />
+            ) : isCheckedIn ? (
               <CheckCircle2 className="h-5 w-5 text-emerald-700" />
             ) : (
               <Clock className="h-5 w-5 text-amber-700 animate-pulse" />
@@ -94,17 +118,21 @@ export function DashboardPulseBar({
             </span>
             <span className="text-[11px] opacity-80 block truncate">
               {isCheckedIn
-                ? `Mortality: ${todayLog?.mortality || 0} • Feed: ${todayLog?.feedKg || 0} kg`
-                : "Log feed, water, and mortality in 30s"}
+                ? `Mortality: ${todayLog?.mortality || 0} • Feed: ${todayLog?.feedKg ?? "—"} kg • ${lastCheckinFormatted || ""}`
+                : "Log feed, water, and mortality in under 60s"}
             </span>
           </div>
         </div>
 
         <Link
-          href="/dashboard/sentinel"
+          href={isCheckedIn ? "/dashboard/sentinel" : "/dashboard/sentinel/checkin"}
           className={cn(
             "px-3 py-1.5 rounded-xl text-xs font-bold shadow-xs shrink-0 flex items-center gap-1 transition-all",
-            isCheckedIn
+            severity === "RED"
+              ? "bg-red-600 hover:bg-red-700 text-white"
+              : severity === "AMBER"
+              ? "bg-amber-600 hover:bg-amber-700 text-white"
+              : isCheckedIn
               ? "bg-emerald-700 hover:bg-emerald-800 text-white"
               : "bg-pankh-marigold hover:bg-amber-600 text-white"
           )}
@@ -116,3 +144,4 @@ export function DashboardPulseBar({
     </div>
   );
 }
+
