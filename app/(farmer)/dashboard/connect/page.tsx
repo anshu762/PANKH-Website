@@ -1,34 +1,46 @@
-import Link from "next/link";
-import { Stethoscope, ArrowLeft, Users } from "lucide-react";
+import { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { getConnectInitialData } from "@/actions/connect";
+import { ConnectView } from "@/components/connect/connect-view";
 
-export default function ConnectPlaceholderPage() {
-  return (
-    <div className="max-w-2xl mx-auto py-12 text-center space-y-6 animate-in fade-in duration-200">
-      <div className="h-16 w-16 rounded-2xl bg-orange-100 border border-orange-300 flex items-center justify-center mx-auto text-orange-800 shadow-sm">
-        <Stethoscope className="h-8 w-8" />
-      </div>
+export const metadata: Metadata = {
+  title: "Pankh Connect — Vet & Diagnostic Lab Network",
+  description: "Direct veterinary escalation and verified diagnostic lab network across Punjab",
+};
 
-      <div className="space-y-2">
-        <span className="text-xs font-mono uppercase tracking-wider px-3 py-1 rounded-full bg-orange-100 text-orange-950 font-bold">
-          Phase 5 Module
-        </span>
-        <h1 className="font-serif text-3xl font-bold text-pankh-clay">
-          Pankh Connect
-        </h1>
-        <p className="text-stone-600 text-sm max-w-md mx-auto leading-relaxed">
-          Geo-located verified veterinarians, diagnostic labs, teleconsultation, and automated escalation via WhatsApp and SMS. Built in Phase 5.
+export const dynamic = "force-dynamic";
+
+export default async function ConnectPage() {
+  const result = await getConnectInitialData();
+
+  if (result.error === "Unauthorized") {
+    redirect("/login");
+  }
+
+  if (result.needsOnboarding) {
+    redirect("/onboarding");
+  }
+
+  if (!result.success || !result.context) {
+    return (
+      <div className="max-w-4xl mx-auto py-12 px-4 text-center">
+        <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100">
+          Unable to Load Pankh Connect
+        </h2>
+        <p className="text-sm text-stone-600 dark:text-stone-400 mt-2">
+          {result.error || "Please verify your active farm profile and try again."}
         </p>
       </div>
+    );
+  }
 
-      <div className="pt-4">
-        <Link
-          href="/dashboard"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-pankh-clay hover:bg-stone-800 text-white text-xs sm:text-sm font-semibold transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span>Back to Dashboard</span>
-        </Link>
-      </div>
+  return (
+    <div className="max-w-6xl mx-auto px-3 sm:px-6 py-4 sm:py-6">
+      <ConnectView
+        initialContext={result.context}
+        initialCases={result.cases || []}
+        initialVets={result.nearbyVets || []}
+      />
     </div>
   );
 }
