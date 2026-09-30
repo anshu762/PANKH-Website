@@ -3,6 +3,7 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { buildBatchEconomicsReport } from "@/lib/economics/calculations";
 
 export async function getFarmerDashboardData() {
   const session = await auth();
@@ -57,9 +58,12 @@ export async function getFarmerDashboardData() {
       todayLog = await prisma.dailyHealthLog.findFirst({
         where: {
           batchId: activeBatch.id,
-          createdAt: { gte: startOfDay },
+          OR: [
+            { createdAt: { gte: startOfDay } },
+            { date: { gte: startOfDay } },
+          ],
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: [{ date: "desc" }, { createdAt: "desc" }],
       });
 
       // Fetch latest sentinel alerts
@@ -80,17 +84,16 @@ export async function getFarmerDashboardData() {
         take: 5,
       });
 
-      // Sum transactions
+      // Fetch transactions and compute deterministic batch economics
       const transactions = await prisma.transaction.findMany({
         where: { batchId: activeBatch.id },
-        select: { type: true, amount: true },
       });
 
-      for (const tx of transactions) {
-        const num = Number(tx.amount);
-        if (tx.type === "EXPENSE") totalSpend += num;
-        if (tx.type === "REVENUE") totalRevenue += num;
-      }
+      const report = buildBatchEconomicsReport(
+        activeBatch,
+        transactions,
+        recentLogs
+      );
 
       // Calculate flock cycle
       let flockDay = 1;
@@ -137,13 +140,14 @@ export async function getFarmerDashboardData() {
           recommendation: "Keep roof sprinklers and foggers active from 11:30 AM to 4:30 PM",
         },
         economics: {
-          totalSpend,
-          totalRevenue,
-          netMargin: totalRevenue - totalSpend,
-          estimatedCostPerBird:
-            activeBatch.currentBirds > 0
-              ? Math.round(totalSpend / activeBatch.currentBirds)
-              : 0,
+          totalSpend: report.totalBatchCost.value ?? 0,
+          totalRevenue: report.revenue.value ?? 0,
+          netMargin: report.grossMargin.value ?? 0,
+          estimatedCostPerBird: report.costPerSurvivingBird.value ?? 0,
+          costPerBirdPlaced: report.costPerBirdPlaced.value ?? 0,
+          feedCostShare: report.feedCostShare.value ?? 0,
+          isEstimated: report.costPerSurvivingBird.isEstimated,
+          assumptions: report.costPerSurvivingBird.assumptions,
         },
       };
     }

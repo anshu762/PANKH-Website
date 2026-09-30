@@ -34,6 +34,10 @@ interface FarmerHomeViewProps {
     totalRevenue: number;
     netMargin: number;
     estimatedCostPerBird?: number;
+    costPerBirdPlaced?: number;
+    feedCostShare?: number;
+    isEstimated?: boolean;
+    assumptions?: string[];
   };
 }
 
@@ -65,6 +69,8 @@ export function FarmerHomeView({
       <DashboardPulseBar
         weather={weather}
         todayLog={todayLog}
+        latestAlert={latestAlert}
+        recentLogs={recentLogs}
       />
 
       {/* 3. Fast Operational Shortcuts */}
@@ -75,6 +81,7 @@ export function FarmerHomeView({
         batch={batch}
         todayLog={todayLog}
         latestAlert={latestAlert}
+        recentLogs={recentLogs}
         economics={economics}
       />
 
@@ -83,6 +90,7 @@ export function FarmerHomeView({
         recentAlerts={recentAlerts}
         recentLogs={recentLogs}
       />
+
     </div>
   );
 }
