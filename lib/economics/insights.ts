@@ -12,6 +12,7 @@ import {
   BatchEconomicsReport,
   EconomicsInsight,
 } from "@/types/economics";
+import { callLlm } from "@/lib/ai/llmClient";
 
 /**
  * Generates rule-based deterministic financial insights for a flock batch.
@@ -177,45 +178,27 @@ export async function rephraseInsightWithTone(
   insight: EconomicsInsight,
   language: "pa" | "hinglish" | "hi" | "en" = "hinglish"
 ): Promise<string> {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-
-  if (apiKey && apiKey.trim().length > 10 && !apiKey.includes("xxxx") && language !== "en") {
+  if (language !== "en") {
     try {
-      const model = process.env.OPENROUTER_MODEL || "anthropic/claude-3.5-sonnet";
       const systemPrompt = `You are a Punjabi poultry farming economics assistant. 
 TASK: Rephrase the provided poultry financial insight sentence into a natural, respectful, supportive ${language === "pa" ? "Punjabi (Gurmukhi)" : language === "hi" ? "Hindi (Devanagari)" : "Hinglish (conversational North Indian)"} tone for a farmer.
 
 CRITICAL HARD RULE: You must PRESERVE EVERY SINGLE NUMBER AND CURRENCY EXACTLY AS WRITTEN. NEVER change, round, or recalculate any numbers, percentages, or rupee amounts.
 Output ONLY the rephrased sentence text, nothing else.`;
 
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": "https://pankh.app",
-          "X-Title": "Pankh Economics Rephrase",
-        },
-        body: JSON.stringify({
-          model,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: `Insight Headline: "${insight.headline}"\nInsight Body: "${insight.body}"` },
-          ],
-          temperature: 0.1,
-          max_tokens: 150,
-        }),
+      const output = await callLlm({
+        systemPrompt,
+        userPrompt: `Insight Headline: "${insight.headline}"\nInsight Body: "${insight.body}"`,
+        jsonMode: false,
+        temperature: 0.1,
+        maxTokens: 150,
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        const content = data.choices?.[0]?.message?.content?.trim();
-        if (content && content.length > 5) {
-          return content;
-        }
+      if (output && output.trim().length > 5) {
+        return output.trim();
       }
     } catch (e) {
-      console.warn("OpenRouter tone polishing fallback to deterministic:", e);
+      console.warn("LLM tone polishing fallback to deterministic:", e);
     }
   }
 

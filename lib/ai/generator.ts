@@ -15,6 +15,7 @@ import {
   PankhIntent,
   StructuredAiAnswer,
 } from "@/types/ai";
+import { callLlm } from "./llmClient";
 
 export type { StructuredAiAnswer };
 
@@ -74,62 +75,41 @@ OUTPUT JSON SCHEMA:
 export async function generateStructuredAnswer(params: GenerateParams): Promise<StructuredAiAnswer> {
   const { query, intent, redFlags, retrievedChunks, birdType } = params;
   const forcedEscalate = redFlags.triggered || intent === "emergency";
-  const apiKey = process.env.OPENROUTER_API_KEY;
+  const systemPrompt = buildSystemPrompt(retrievedChunks, forcedEscalate);
+  const userMessage = `<farmer_query>\nFlock Type: ${birdType || "Broiler"}\nQuestion: ${query}\n</farmer_query>`;
 
-  if (apiKey && apiKey.trim().length > 10 && !apiKey.includes("xxxx")) {
-    try {
-      const model = process.env.OPENROUTER_MODEL || "anthropic/claude-3.5-sonnet";
-      const systemPrompt = buildSystemPrompt(retrievedChunks, forcedEscalate);
+  try {
+    const rawOutput = await callLlm({
+      systemPrompt,
+      userPrompt: userMessage,
+      jsonMode: true,
+      temperature: 0.2,
+      maxTokens: 800,
+    });
 
-      const userMessage = `<farmer_query>\nFlock Type: ${birdType || "Broiler"}\nQuestion: ${query}\n</farmer_query>`;
+    if (rawOutput) {
+      const parsed = JSON.parse(rawOutput);
+      const topSource =
+        retrievedChunks.find(
+          (c) => c.sourceTitle.toLowerCase() === (parsed.sourceTitle || "").toLowerCase()
+        ) || retrievedChunks[0];
 
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": "https://pankh.app",
-          "X-Title": "Pankh AI Assistant",
-        },
-        body: JSON.stringify({
-          model,
-          response_format: { type: "json_object" },
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userMessage },
-          ],
-          temperature: 0.2,
-          max_tokens: 800,
-        }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        const content = data.choices?.[0]?.message?.content;
-        if (content) {
-          const parsed = JSON.parse(content);
-          const topSource = retrievedChunks.find(
-            (c) => c.sourceTitle.toLowerCase() === (parsed.sourceTitle || "").toLowerCase()
-          ) || retrievedChunks[0];
-
-          return {
-            answer: parsed.answer,
-            why: Array.isArray(parsed.why) ? parsed.why.slice(0, 3) : [],
-            whatToDo: Array.isArray(parsed.whatToDo) ? parsed.whatToDo : [],
-            ask: Array.isArray(parsed.ask) ? parsed.ask.slice(0, 3) : [],
-            escalate: forcedEscalate || !!parsed.escalate,
-            escalateReason: forcedEscalate
-              ? redFlags.reasons.join("; ") || "Urgent veterinary escalation recommended"
-              : parsed.escalateReason || null,
-            sourceTitle: topSource ? topSource.sourceTitle : "No Verified Source Available",
-            sourceAuthority: topSource ? topSource.sourceAuthority : undefined,
-            retrievedChunkIds: retrievedChunks.map((c) => c.id),
-          };
-        }
-      }
-    } catch (err) {
-      console.error("OpenRouter LLM call error, using deterministic synthesis:", err);
+      return {
+        answer: parsed.answer,
+        why: Array.isArray(parsed.why) ? parsed.why.slice(0, 3) : [],
+        whatToDo: Array.isArray(parsed.whatToDo) ? parsed.whatToDo : [],
+        ask: Array.isArray(parsed.ask) ? parsed.ask.slice(0, 3) : [],
+        escalate: forcedEscalate || !!parsed.escalate,
+        escalateReason: forcedEscalate
+          ? redFlags.reasons.join("; ") || "Urgent veterinary escalation recommended"
+          : parsed.escalateReason || null,
+        sourceTitle: topSource ? topSource.sourceTitle : "No Verified Source Available",
+        sourceAuthority: topSource ? topSource.sourceAuthority : undefined,
+        retrievedChunkIds: retrievedChunks.map((c) => c.id),
+      };
     }
+  } catch (err) {
+    console.error("LLM call parsing error, using deterministic synthesis:", err);
   }
 
   // High-fidelity agrarian fallback synthesizer

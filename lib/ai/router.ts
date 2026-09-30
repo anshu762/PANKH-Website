@@ -15,6 +15,7 @@
 
 import { PankhIntent, IntentClassificationResult } from "@/types/ai";
 import { HEALTH_RELATED_INTENTS } from "@/constants/ai";
+import { callLlm } from "./llmClient";
 
 export type { PankhIntent, IntentClassificationResult };
 
@@ -164,12 +165,8 @@ export function classifyIntentDeterministically(query: string): IntentClassifica
  * with graceful fallback to deterministic classification.
  */
 export async function classifyIntent(query: string): Promise<IntentClassificationResult> {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-
-  if (apiKey && apiKey.trim().length > 10 && !apiKey.includes("xxxx")) {
-    try {
-      const model = process.env.OPENROUTER_MODEL || "anthropic/claude-3.5-sonnet";
-      const systemPrompt = `You are the Intent Router for Pankh, a poultry farm intelligence platform in Punjab, India.
+  try {
+    const systemPrompt = `You are the Intent Router for Pankh, a poultry farm intelligence platform in Punjab, India.
 Classify the farmer's query into exactly one of these categories:
 - health: Non-emergency diseases, symptoms, illness, droppings changes.
 - feed: Feed management, nutrition, crude protein, intake, FCR.
@@ -188,55 +185,38 @@ Return ONLY valid JSON matching this schema:
   "reasoning": "brief explanation"
 }`;
 
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": "https://pankh.app",
-          "X-Title": "Pankh AI Assistant",
-        },
-        body: JSON.stringify({
-          model,
-          response_format: { type: "json_object" },
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: `Query: ${query}` },
-          ],
-          temperature: 0.1,
-          max_tokens: 150,
-        }),
-      });
+    const rawOutput = await callLlm({
+      systemPrompt,
+      userPrompt: `Query: ${query}`,
+      jsonMode: true,
+      temperature: 0.1,
+      maxTokens: 150,
+    });
 
-      if (res.ok) {
-        const data = await res.json();
-        const content = data.choices?.[0]?.message?.content;
-        if (content) {
-          const parsed = JSON.parse(content);
-          const validIntents: PankhIntent[] = [
-            "health",
-            "feed",
-            "vaccine",
-            "hygiene",
-            "weather",
-            "economics",
-            "general_management",
-            "emergency",
-            "unrelated",
-          ];
-          if (validIntents.includes(parsed.intent)) {
-            return {
-              intent: parsed.intent,
-              confidence: parsed.confidence ?? 0.9,
-              reasoning: parsed.reasoning ?? "LLM structured classification",
-              isHealthRelated: HEALTH_RELATED_INTENTS.has(parsed.intent),
-            };
-          }
-        }
+    if (rawOutput) {
+      const parsed = JSON.parse(rawOutput);
+      const validIntents: PankhIntent[] = [
+        "health",
+        "feed",
+        "vaccine",
+        "hygiene",
+        "weather",
+        "economics",
+        "general_management",
+        "emergency",
+        "unrelated",
+      ];
+      if (validIntents.includes(parsed.intent)) {
+        return {
+          intent: parsed.intent,
+          confidence: parsed.confidence ?? 0.9,
+          reasoning: parsed.reasoning ?? "LLM structured classification",
+          isHealthRelated: HEALTH_RELATED_INTENTS.has(parsed.intent),
+        };
       }
-    } catch {
-      // Fallback to deterministic classification on API failure
     }
+  } catch {
+    // Fallback to deterministic classification on API failure
   }
 
   return classifyIntentDeterministically(query);
