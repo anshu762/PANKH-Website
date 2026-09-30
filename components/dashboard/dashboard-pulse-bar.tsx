@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Sun, CloudSun, AlertCircle, CheckCircle2, Clock, ArrowRight } from "lucide-react";
+import { Sun, AlertCircle, CheckCircle2, Clock, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
 import { cn } from "@/lib/utils";
 
