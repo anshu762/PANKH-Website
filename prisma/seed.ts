@@ -274,6 +274,91 @@ async function main() {
   // 4. Seed Punjab Vet, Lab & Association Directory
   await seedVetLabs(prisma);
 
+  // 5. Seed Approved Standard Poultry Vaccination Schedules (Phase 8 Section 7.3)
+  const existingSchedules = await prisma.vaccinationSchedule.count();
+  if (existingSchedules === 0) {
+    console.log("💉 Seeding standard approved poultry vaccination schedules...");
+    const defaultSchedules = [
+      {
+        productionType: ProductionType.BROILER,
+        dayDue: 1,
+        vaccineName: "Marek's Disease Vaccine (HVT)",
+        route: "Subcutaneous",
+        diseaseTarget: "Marek's Disease",
+        mandatory: true,
+        notes: "Administered at hatchery on Day 1 of placement",
+      },
+      {
+        productionType: ProductionType.BROILER,
+        dayDue: 5,
+        vaccineName: "Ranikhet (Newcastle) B1 Strain",
+        route: "Eye drop / Coarse spray",
+        diseaseTarget: "Newcastle Disease (ND)",
+        mandatory: true,
+        notes: "Give early morning in cool hours. Ensure clean, chlorine-free water.",
+      },
+      {
+        productionType: ProductionType.BROILER,
+        dayDue: 14,
+        vaccineName: "Gumboro (IBD) Intermediate Strain",
+        route: "Drinking water",
+        diseaseTarget: "Infectious Bursal Disease",
+        mandatory: true,
+        notes: "Withhold water 1-2 hours prior. Add skim milk powder (2g/L) as stabilizer.",
+      },
+      {
+        productionType: ProductionType.BROILER,
+        dayDue: 21,
+        vaccineName: "Ranikhet (Newcastle) LaSota Strain Booster",
+        route: "Drinking water",
+        diseaseTarget: "Newcastle Disease (ND)",
+        mandatory: true,
+        notes: "Second protection booster against field strains.",
+      },
+      {
+        productionType: ProductionType.BROILER,
+        dayDue: 28,
+        vaccineName: "Gumboro (IBD) Booster Strain",
+        route: "Drinking water",
+        diseaseTarget: "Infectious Bursal Disease",
+        mandatory: false,
+        notes: "Recommended in high-density poultry corridors (Ludhiana, Sangrur).",
+      },
+      {
+        productionType: ProductionType.LAYER,
+        dayDue: 35,
+        vaccineName: "Fowl Pox Vaccine",
+        route: "Wing web puncture",
+        diseaseTarget: "Avian Pox",
+        mandatory: true,
+        notes: "Check for 'take' swelling 7 days post-vaccination.",
+      },
+      {
+        productionType: ProductionType.LAYER,
+        dayDue: 70,
+        vaccineName: "Infectious Coryza Inactivated",
+        route: "Subcutaneous",
+        diseaseTarget: "Infectious Coryza",
+        mandatory: true,
+        notes: "Protects against Avibacterium paragallinarum respiratory complex.",
+      },
+      {
+        productionType: ProductionType.LAYER,
+        dayDue: 112,
+        vaccineName: "ND + EDS (Egg Drop Syndrome) Inactivated",
+        route: "Intramuscular breast",
+        diseaseTarget: "ND and Egg Drop Syndrome",
+        mandatory: true,
+        notes: "Given at 16 weeks before onset of commercial egg laying.",
+      },
+    ];
+
+    for (const item of defaultSchedules) {
+      await prisma.vaccinationSchedule.create({ data: item });
+    }
+    console.log(`✅ Seeded ${defaultSchedules.length} standard vaccination schedule items.`);
+  }
+
   console.log("🌱 Database seeding completed successfully.");
 }
 

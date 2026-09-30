@@ -112,6 +112,7 @@ model Farmer {
   farms         Farm[]
   caseRecords   CaseRecord[]
   conversations Conversation[]
+  notifications Notification[]
 
   @@index([district, state])
 }
@@ -376,4 +377,39 @@ model EventLog {
 
   @@index([eventType, timestamp])
   @@index([userId, timestamp])
+}
+
+model Notification {
+  id              String   @id @default(cuid())
+  farmerId        String
+  farmer          Farmer   @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+  type            String   // CHECKIN_REMINDER | AMBER_ALERT | RED_ALERT | CASE_UPDATE | VACCINATION_DUE | WEEKLY_ECONOMICS
+  title           String
+  body            String
+  severity        String   @default("INFO") // INFO | WARNING | CRITICAL
+  linkUrl         String?
+  read            Boolean  @default(false)
+  sentViaWhatsApp Boolean  @default(false)
+  sentViaSms      Boolean  @default(false)
+  metadata        Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([farmerId, read, createdAt])
+  @@index([farmerId, type, createdAt])
+}
+
+model VaccinationSchedule {
+  id             String         @id @default(cuid())
+  productionType ProductionType @default(BROILER)
+  dayDue         Int
+  vaccineName    String
+  route          String
+  diseaseTarget  String
+  mandatory      Boolean        @default(true)
+  notes          String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([productionType, dayDue])
 }
