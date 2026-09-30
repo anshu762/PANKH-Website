@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { useLanguage } from "@/hooks/use-language";
+import { NotificationBell } from "@/components/common/notification-bell";
 
 export function SidebarBrand() {
   const { t } = useLanguage();
@@ -27,6 +28,7 @@ export function SidebarBrand() {
           </span>
         </div>
       </Link>
+      <NotificationBell />
     </div>
   );
 }

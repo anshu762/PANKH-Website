@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { useLanguage } from "@/hooks/use-language";
 import { LanguageSelector } from "@/components/common/language-selector";
+import { NotificationBell } from "@/components/common/notification-bell";
 
 export function FarmerMobileHeader() {
   const { t } = useLanguage();
@@ -18,7 +19,10 @@ export function FarmerMobileHeader() {
           {t.common.platformName}
         </span>
       </Link>
-      <LanguageSelector variant="pill" />
+      <div className="flex items-center gap-2">
+        <NotificationBell />
+        <LanguageSelector variant="pill" />
+      </div>
     </header>
   );
 }

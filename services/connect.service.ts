@@ -10,6 +10,7 @@ import { CreateFarmerCaseInput } from "@/schemas/connect";
 import { generateCaseSummary } from "@/lib/connect/caseSummary";
 import { rankVetLabs, DEFAULT_PUNJAB_ORIGIN, GeoPoint } from "@/lib/connect/matching";
 import { sendTwilioMessage } from "@/lib/connect/twilio";
+import { evaluateCaseStatusNotification } from "@/lib/notifications/rules";
 
 export class ConnectService {
   /**
@@ -492,6 +493,14 @@ export class ConnectService {
       },
       { timeout: 25000, maxWait: 15000 }
     );
+
+    // Section 7.3: In-app + WhatsApp status notification
+    evaluateCaseStatusNotification(
+      updated.farmerId,
+      updated.id,
+      status,
+      updated.assignedVetLab?.name
+    ).catch((err) => console.error("Error dispatching case status notification:", err));
 
     return updated as unknown as CaseWithRelations;
   }
