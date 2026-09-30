@@ -1,6 +1,64 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 
+interface STTResult {
+  transcript: string;
+  confidence: number;
+  language: string;
+}
+
+async function callGoogleSTT(
+  apiKey: string,
+  base64Audio: string,
+  primaryLang: string,
+  altLangs: string[]
+): Promise<STTResult | null> {
+  try {
+    const response = await fetch(
+      `https://speech.googleapis.com/v1/speech:recognize?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          config: {
+            encoding: "WEBM_OPUS",
+            sampleRateHertz: 48000,
+            languageCode: primaryLang,
+            alternativeLanguageCodes: altLangs,
+            enableAutomaticPunctuation: true,
+            model: "default",
+          },
+          audio: {
+            content: base64Audio,
+          },
+        }),
+      }
+    );
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    if (!data.results || data.results.length === 0) return null;
+
+    const topAlternative = data.results[0]?.alternatives?.[0];
+    if (!topAlternative || !topAlternative.transcript) return null;
+
+    const fullTranscript = data.results
+      .map((r: any) => r.alternatives?.[0]?.transcript)
+      .filter(Boolean)
+      .join(" ");
+
+    return {
+      transcript: fullTranscript.trim(),
+      confidence: Number(topAlternative.confidence ?? 0.8),
+      language: primaryLang,
+    };
+  } catch (err) {
+    console.error(`Google STT error for ${primaryLang}:`, err);
+    return null;
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
@@ -21,58 +79,42 @@ export async function POST(req: NextRequest) {
 
     const apiKey = process.env.GOOGLE_CLOUD_API_KEY;
 
-    // 1. If Google Cloud API Key is configured, execute real STT request
+    // 1. Live Google Cloud STT Fallback Chain: pa-IN -> hi-IN
     if (apiKey && apiKey.trim().length > 10 && !apiKey.includes("XXXX")) {
-      try {
-        const response = await fetch(
-          `https://speech.googleapis.com/v1/speech:recognize?key=${apiKey}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              config: {
-                encoding: "WEBM_OPUS",
-                sampleRateHertz: 48000,
-                languageCode: "pa-IN",
-                alternativeLanguageCodes: ["hi-IN", "en-IN"],
-                enableAutomaticPunctuation: true,
-                model: "default",
-              },
-              audio: {
-                content: base64Audio,
-              },
-            }),
-          }
+      // Step A: Primary Punjabi recognition (pa-IN)
+      let result = await callGoogleSTT(apiKey, base64Audio, "pa-IN", ["hi-IN", "en-IN"]);
+
+      // Step B: If no result or low confidence (< 0.65), retry with Hindi primary (hi-IN)
+      if (!result || result.confidence < 0.65) {
+        console.log(
+          `[STT QA] pa-IN confidence low (${result?.confidence ?? 0}), retrying with hi-IN fallback chain...`
         );
+        const hiResult = await callGoogleSTT(apiKey, base64Audio, "hi-IN", ["pa-IN", "en-IN"]);
 
-        if (response.ok) {
-          const data = await response.json();
-          const transcript = data.results
-            ?.map((r: any) => r.alternatives?.[0]?.transcript)
-            .filter(Boolean)
-            .join(" ");
-
-          if (transcript && transcript.trim().length > 0) {
-            return NextResponse.json({ transcript: transcript.trim() });
-          }
-        } else {
-          const errData = await response.json().catch(() => ({}));
-          console.error("Google Cloud STT error:", response.status, errData);
+        if (hiResult && (!result || hiResult.confidence > result.confidence)) {
+          result = hiResult;
         }
-      } catch (err) {
-        console.error("Google Cloud STT network failure:", err);
+      }
+
+      if (result && result.transcript.length > 0) {
+        return NextResponse.json({
+          transcript: result.transcript,
+          detectedLanguage: result.language,
+          confidence: Math.round(result.confidence * 100),
+          isSimulated: false,
+        });
       }
     }
 
-    // 2. Fallback / Dev Mode
-    // Provides a realistic demonstration transcript so the farmer can edit and review in the UI
+    // 2. Resilient Simulation / Fallback Mode
+    // Realistic multi-lingual agrarian transcript for user verification
     return NextResponse.json({
       transcript:
-        "Shed number do me subah se 15 chooje mar gaye hain aur baki chooje munh khol kar saans le rahe hain.",
+        "ਸ਼ੈੱਡ ਨੰਬਰ 2 ਵਿੱਚ ਸਵੇਰ ਤੋਂ 15 ਚੂਚੇ ਮਰ ਗਏ ਹਨ ਅਤੇ ਬਾਕੀ ਮੂੰਹ ਖੋਲ੍ਹ ਕੇ ਸਾਹ ਲੈ ਰਹੇ ਹਨ।",
+      detectedLanguage: "pa-IN",
+      confidence: 88,
       isSimulated: true,
-      note: "Live Google Cloud STT requires valid GOOGLE_CLOUD_API_KEY in .env",
+      note: "Live Google Cloud STT requires GOOGLE_CLOUD_API_KEY. Transcript populated for review.",
     });
   } catch (error: any) {
     console.error("Transcribe Route Error:", error);

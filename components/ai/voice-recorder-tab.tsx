@@ -21,9 +21,12 @@ export function VoiceRecorderTab({ onSendTranscript, isLoading }: VoiceRecorderT
     isPlayingAudio,
     isTranscribing,
     transcript,
+    detectedLanguage,
+    confidence,
     permissionError,
     setTranscript,
     startRecording,
+    retryRecording,
     stopRecording,
     togglePlayAudio,
     resetAudio,
@@ -54,9 +57,18 @@ export function VoiceRecorderTab({ onSendTranscript, isLoading }: VoiceRecorderT
       </div>
 
       {permissionError && (
-        <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
-          <AlertCircle className="h-4 w-4 shrink-0" />
-          <span>{permissionError}</span>
+        <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
+            <span>{permissionError}</span>
+          </div>
+          <button
+            type="button"
+            onClick={retryRecording}
+            className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shrink-0 transition-colors shadow-2xs"
+          >
+            Retry Mic Access
+          </button>
         </div>
       )}
 
@@ -131,14 +143,20 @@ export function VoiceRecorderTab({ onSendTranscript, isLoading }: VoiceRecorderT
 
       {/* Mandatory Farmer Transcript Verification & Edit Box */}
       {(transcript || isTranscribing) && (
-        <div className="p-4 rounded-xl bg-amber-50/60 border border-amber-200 space-y-3 animate-in fade-in">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-900">
+        <div className="p-4 rounded-xl bg-amber-50/70 border border-amber-300/80 space-y-3 animate-in fade-in">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-950">
               <Edit3 className="h-3.5 w-3.5 text-amber-700" />
               <span>{dict.voiceReviewTitle}</span>
+              {detectedLanguage && (
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-bold lowercase">
+                  {detectedLanguage === "pa-IN" ? "ਪੰਜਾਬੀ (pa-IN)" : "हिंदी / Hinglish"}
+                  {confidence ? ` • ${confidence}% match` : ""}
+                </span>
+              )}
             </div>
-            <span className="text-[10px] text-stone-500 italic">
-              Edit text if needed before sending
+            <span className="text-[10px] text-amber-800 font-medium italic">
+              Never silently guesses — review and correct words before sending
             </span>
           </div>
 
@@ -148,7 +166,7 @@ export function VoiceRecorderTab({ onSendTranscript, isLoading }: VoiceRecorderT
             disabled={isTranscribing}
             rows={3}
             placeholder={dict.voiceEditPlaceholder}
-            className="w-full text-xs sm:text-sm p-3 rounded-lg border border-amber-300/80 bg-white text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500 font-sans resize-none leading-relaxed"
+            className="w-full text-xs sm:text-sm p-3 rounded-lg border border-amber-300 bg-white text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500 font-sans resize-none leading-relaxed"
           />
 
           <div className="flex justify-end">

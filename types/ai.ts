@@ -121,6 +121,8 @@ export interface PhotoAnalysisResponse {
 
 export interface TranscribeResponse {
   transcript: string;
+  detectedLanguage?: string;
+  confidence?: number;
   isSimulated?: boolean;
   note?: string;
 }

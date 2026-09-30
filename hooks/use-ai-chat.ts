@@ -68,8 +68,6 @@ export function useAiChat({
         createdAt: new Date().toISOString(),
       };
 
-      setMessages((prev) => [...prev, userMessage]);
-      clearDraft();
       setIsLoading(true);
 
       try {
@@ -79,6 +77,8 @@ export function useAiChat({
           inputMode: mode,
           batchId: activeBatchId || undefined,
         });
+
+        clearDraft();
 
         if (data.conversationId) {
           setConversationId(data.conversationId);
@@ -99,7 +99,9 @@ export function useAiChat({
         setMessages((prev) => [...prev, assistantMessage]);
       } catch (err: any) {
         console.error("useAiChat error:", err);
-        setError(err.message || "Network issue. Please try sending again.");
+        // Rule #7: Preserve query in draft on network failure for retry
+        updateDraft(text);
+        setError(err.message || "Network issue. Your question was preserved. Tap to retry.");
       } finally {
         setIsLoading(false);
       }

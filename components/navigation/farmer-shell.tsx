@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { FarmerSidebar } from "./farmer-sidebar";
 import { FarmerMobileHeader } from "./farmer-mobile-header";
 import { FarmerMobileBottomNav } from "./farmer-mobile-bottom-nav";
+import { OfflineBanner } from "@/components/common/offline-banner";
 import type { Session } from "next-auth";
 
 interface FarmerShellProps {
@@ -38,6 +39,9 @@ export function FarmerShell({ children, session }: FarmerShellProps) {
 
       {/* Mobile Bottom Navigation */}
       <FarmerMobileBottomNav />
+
+      {/* Global Offline Network Status Alert */}
+      <OfflineBanner />
     </div>
   );
 }

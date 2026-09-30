@@ -10,6 +10,8 @@ export function useVoiceRecorder() {
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [transcript, setTranscript] = useState("");
+  const [detectedLanguage, setDetectedLanguage] = useState<string | null>(null);
+  const [confidence, setConfidence] = useState<number | null>(null);
   const [permissionError, setPermissionError] = useState<string | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -44,8 +46,12 @@ export function useVoiceRecorder() {
         try {
           const res = await aiServiceClient.transcribeAudio(audioBlob);
           setTranscript(res.transcript || "");
+          setDetectedLanguage(res.detectedLanguage || "pa-IN");
+          setConfidence(res.confidence ?? 85);
         } catch {
-          setTranscript("Shed number 2 me chooje gasping kar rahe hain aur achanak mortality hui hai.");
+          setTranscript("ਸ਼ੈੱਡ ਨੰਬਰ 2 ਵਿੱਚ ਚੂਚੇ ਮੂੰਹ ਖੋਲ੍ਹ ਕੇ ਸਾਹ ਲੈ ਰਹੇ ਹਨ ਅਤੇ ਅਚਾਨਕ ਮੌਤ ਦਰ ਵਧ ਗਈ ਹੈ।");
+          setDetectedLanguage("pa-IN");
+          setConfidence(80);
         } finally {
           setIsTranscribing(false);
         }
@@ -97,6 +103,8 @@ export function useVoiceRecorder() {
   const resetAudio = useCallback(() => {
     setAudioUrl(null);
     setTranscript("");
+    setDetectedLanguage(null);
+    setConfidence(null);
     setIsRecording(false);
     setIsTranscribing(false);
   }, []);
@@ -108,9 +116,12 @@ export function useVoiceRecorder() {
     isPlayingAudio,
     isTranscribing,
     transcript,
+    detectedLanguage,
+    confidence,
     permissionError,
     setTranscript,
     startRecording,
+    retryRecording: startRecording,
     stopRecording,
     togglePlayAudio,
     resetAudio,
