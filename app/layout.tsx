@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, Manrope, Noto_Sans_Gurmukhi } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/context/language-context";
+import { PwaRegister } from "@/components/common/pwa-register";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -39,7 +40,10 @@ export default function RootLayout({
       className={`${fraunces.variable} ${manrope.variable} ${notoSansGurmukhi.variable}`}
     >
       <body className="font-sans antialiased bg-background text-foreground min-h-screen">
-        <LanguageProvider>{children}</LanguageProvider>
+        <LanguageProvider>
+          {children}
+          <PwaRegister />
+        </LanguageProvider>
       </body>
     </html>
   );

@@ -50,6 +50,14 @@ export function SentinelStatusBadge({
 
   return (
     <div
+      role="status"
+      aria-label={
+        isRed
+          ? "Urgent Disease Risk Alert: Critical spike detected"
+          : isAmber
+          ? "Watch Disease Risk Notice: Moderate baseline deviation"
+          : "Normal Flock Health Status: Metrics within safe range"
+      }
       className={cn(
         "rounded-3xl border-3 p-6 sm:p-8 transition-all relative overflow-hidden shadow-xs",
         isRed

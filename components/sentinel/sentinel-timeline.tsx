@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { useLanguage } from "@/hooks/use-language";
 import {
   Calendar,
@@ -26,14 +27,22 @@ export function SentinelTimeline({ logs, alerts = [] }: SentinelTimelineProps) {
 
   if (!logs || logs.length === 0) {
     return (
-      <div className="p-8 rounded-3xl border-2 border-dashed border-stone-200 text-center bg-white space-y-2">
+      <div className="p-8 rounded-3xl border-2 border-dashed border-stone-200 text-center bg-white space-y-3">
         <Clock className="h-8 w-8 text-stone-300 mx-auto" />
         <h4 className="font-serif text-base font-bold text-pankh-clay">
           {s.historyTitle}
         </h4>
-        <p className="text-xs text-stone-500 max-w-sm mx-auto">
+        <p className="text-xs text-stone-500 max-w-sm mx-auto leading-relaxed">
           {s.historyEmpty}
         </p>
+        <div className="pt-2">
+          <Link
+            href="/dashboard/sentinel/checkin"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-pankh-clay hover:bg-stone-800 text-white font-bold text-xs shadow-xs transition-colors"
+          >
+            <span>{s.logTodayCta || "Log Today's First Check-in"}</span>
+          </Link>
+        </div>
       </div>
     );
   }
