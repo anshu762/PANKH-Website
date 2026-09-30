@@ -17,6 +17,8 @@ import {
   ArrowLeft,
   Minus,
   Plus,
+  Sun,
+  Thermometer,
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -35,9 +37,10 @@ interface CheckinFormProps {
     name: string;
     shedCount: number;
   };
+  weather?: any;
 }
 
-export function CheckinForm({ batch, farm }: CheckinFormProps) {
+export function CheckinForm({ batch, farm, weather }: CheckinFormProps) {
   const router = useRouter();
   const { t } = useLanguage();
   const s = t.sentinel;
@@ -299,12 +302,21 @@ export function CheckinForm({ batch, farm }: CheckinFormProps) {
 
         {/* Error Banner */}
         {errorMessage && (
-          <div className="p-4 rounded-2xl bg-red-50 border border-red-300 text-xs text-red-900 flex items-start gap-2.5">
-            <AlertCircle className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
-            <div className="space-y-1">
-              <span className="font-bold block">Submission Error:</span>
-              <p>{errorMessage}</p>
+          <div className="p-4 rounded-2xl bg-red-50 border border-red-300 text-xs text-red-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in">
+            <div className="flex items-start gap-2.5">
+              <AlertCircle className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
+              <div className="space-y-0.5">
+                <span className="font-bold block">Network / Submission Error:</span>
+                <p>{errorMessage}</p>
+              </div>
             </div>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-4 py-2 rounded-xl bg-red-700 hover:bg-red-800 disabled:opacity-50 text-white font-bold text-xs shrink-0 transition-colors shadow-2xs cursor-pointer"
+            >
+              {isSubmitting ? "Retrying..." : "Retry Submission"}
+            </button>
           </div>
         )}
 
@@ -514,13 +526,54 @@ export function CheckinForm({ batch, farm }: CheckinFormProps) {
           {/* ======================================================== */}
           {/* 6. Shed Temperature (Distinct from outside weather)      */}
           {/* ======================================================== */}
-          <div className="pt-4 space-y-2">
+          <div className="pt-4 space-y-3">
+            {/* Ambient Outdoor Weather Context */}
+            {weather && (
+              <div className="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200 text-stone-800 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-amber-950 flex items-center gap-1.5">
+                    <Sun className="h-4 w-4 text-amber-600 shrink-0" />
+                    Outside Ambient Weather ({weather.condition})
+                  </span>
+                  <span className="text-xs font-mono font-bold text-amber-900 bg-amber-100/90 px-2 py-0.5 rounded-full border border-amber-300">
+                    {weather.temp}°C • {weather.humidity}% RH
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-[11px] text-stone-600 pt-1.5 border-t border-amber-200/60">
+                  <span className="flex items-center gap-1">
+                    Heat Index (THI):{" "}
+                    <strong
+                      className={cn(
+                        "font-mono px-1.5 py-0.2 rounded",
+                        weather.heatRisk === "EMERGENCY"
+                          ? "bg-red-100 text-red-800"
+                          : weather.heatRisk === "DANGER"
+                          ? "bg-amber-100 text-amber-900"
+                          : "bg-emerald-100 text-emerald-800"
+                      )}
+                    >
+                      {weather.thi} ({weather.heatRisk})
+                    </strong>
+                  </span>
+                  <span className="text-[10px] text-stone-500 font-mono">
+                    {weather.source || (weather.isEstimated ? "Estimated Baseline" : "Live OWM")}
+                  </span>
+                </div>
+                {weather.recommendation && (
+                  <p className="text-[11px] text-amber-900/90 italic">
+                    💡 {weather.recommendation}
+                  </p>
+                )}
+              </div>
+            )}
+
             <div>
               <label
                 htmlFor="temp-input"
-                className="text-xs sm:text-sm font-bold text-pankh-clay block"
+                className="text-xs sm:text-sm font-bold text-pankh-clay flex items-center gap-1.5"
               >
-                {s.shedTempLabel}
+                <Thermometer className="h-4 w-4 text-pankh-clay" />
+                <span>{s.shedTempLabel} (Indoor Reading)</span>
               </label>
               <p className="text-[11px] text-stone-500">{s.shedTempDesc}</p>
             </div>

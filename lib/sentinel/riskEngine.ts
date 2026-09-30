@@ -81,7 +81,13 @@ export function calculateRisk(
     productionType: "BROILER" | "LAYER" | string;
     placementDate?: Date | string;
   },
-  rules: AlertRuleMap = DEFAULT_ALERT_RULES
+  rules: AlertRuleMap = DEFAULT_ALERT_RULES,
+  weather?: {
+    temp: number;
+    humidity: number;
+    thi?: number;
+    heatRisk?: string;
+  }
 ): RiskAssessment {
   const currentBirds = Math.max(1, batch.currentBirds);
   const reasons: string[] = [];
@@ -241,26 +247,61 @@ export function calculateRisk(
   }
   scoreBreakdown.symptoms = symptomPoints;
 
-  // F. Shed Environment / Temperature Stress
+  // F. Shed Environment / Ambient Weather Heat Stress
   let tempDeviation: number | undefined;
   let tempPoints = 0;
   let activeEnvWeight = rules.WEIGHT_ENVIRONMENT;
 
-  if (log.shedTemp !== null && log.shedTemp !== undefined) {
-    if (log.shedTemp >= rules.SHED_TEMP_CRITICAL_CELSIUS) {
+  const hasShedTemp = log.shedTemp !== null && log.shedTemp !== undefined;
+  const hasWeather = weather && typeof weather.temp === "number";
+
+  if (hasShedTemp) {
+    if (log.shedTemp! > ageBand.tempToleranceMax) {
+      tempDeviation = Number((log.shedTemp! - ageBand.tempToleranceMax).toFixed(1));
+    }
+
+    if (log.shedTemp! >= rules.SHED_TEMP_CRITICAL_CELSIUS) {
       tempPoints = 100;
       reasons.push(
         `Critical shed temperature (${log.shedTemp}°C) exceeds heat prostration limit of ${rules.SHED_TEMP_CRITICAL_CELSIUS}°C`
       );
-    } else if (log.shedTemp >= rules.SHED_TEMP_HIGH_CELSIUS) {
-      tempPoints = 50;
+    } else if (log.shedTemp! >= rules.SHED_TEMP_HIGH_CELSIUS) {
+      tempPoints = 60;
       reasons.push(
         `High shed indoor temperature (${log.shedTemp}°C, warning threshold ${rules.SHED_TEMP_HIGH_CELSIUS}°C)`
       );
-    } else if (log.shedTemp > ageBand.tempToleranceMax + 4) {
+    } else if (log.shedTemp! > ageBand.tempToleranceMax + 4) {
       tempPoints = 35;
       reasons.push(
         `Shed temperature (${log.shedTemp}°C) is above optimal comfort zone (${ageBand.tempToleranceMax}°C) for ${ageBand.bandName}`
+      );
+    }
+
+    // Compound with ambient outdoor weather THI if available
+    if (hasWeather && weather.thi && weather.thi >= 78) {
+      if (tempPoints >= 60) {
+        tempPoints = Math.min(100, tempPoints + 20);
+        reasons.push(
+          `Extreme heat prostration risk: Outdoor THI of ${weather.thi} (${weather.temp}°C, ${weather.humidity}% RH) severely impairs shed evaporative cooling`
+        );
+      } else {
+        tempPoints = Math.max(tempPoints, 40);
+        reasons.push(
+          `Elevated outdoor heat stress (THI ${weather.thi}) puts shed microclimate under thermal load`
+        );
+      }
+    }
+  } else if (hasWeather && weather.thi && weather.thi >= 78) {
+    // If farmer did not record manual indoor temp, use hyper-local ambient THI
+    if (weather.thi >= 84) {
+      tempPoints = 75;
+      reasons.push(
+        `Critical ambient weather heat stress (THI ${weather.thi}, ${weather.temp}°C). High heat prostration risk for flock`
+      );
+    } else {
+      tempPoints = 45;
+      reasons.push(
+        `Alert: Outdoor weather indicates ambient heat stress (THI ${weather.thi}, ${weather.temp}°C)`
       );
     }
   } else {

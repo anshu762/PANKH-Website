@@ -26,7 +26,7 @@ interface FarmerHomeViewProps {
     temp: number;
     condition: string;
     humidity: number;
-    heatRisk: "LOW" | "MODERATE" | "HIGH" | "CRITICAL";
+    heatRisk: "NORMAL" | "MODERATE" | "HIGH" | "EMERGENCY" | "LOW" | "CRITICAL" | string;
     recommendation: string;
   };
   economics: {

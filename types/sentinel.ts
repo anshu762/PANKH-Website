@@ -99,4 +99,5 @@ export interface SentinelDashboardData {
   latestRisk?: RiskAssessment | null;
   lastCheckinTime?: string | null;
   isCheckedInToday: boolean;
+  weather?: any;
 }

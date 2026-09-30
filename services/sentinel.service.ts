@@ -9,6 +9,11 @@ import {
 import { calculateBatchBaseline } from "@/lib/sentinel/baseline";
 import { calculateRisk } from "@/lib/sentinel/riskEngine";
 import { getAlertRulesMap } from "@/lib/sentinel/rules";
+import { weatherService } from "@/services/weather.service";
+import {
+  evaluateAmberAlertNotification,
+  evaluateRedAlertNotification,
+} from "@/lib/notifications/rules";
 
 export class SentinelService {
   /**
@@ -99,6 +104,13 @@ export class SentinelService {
     const baseline = calculateBatchBaseline(recentLogs);
     const rules = await getAlertRulesMap();
 
+    // Fetch live weather for the farm location
+    const weather = await weatherService.getWeatherForFarm(
+      farm.latitude,
+      farm.longitude,
+      farmer.district
+    );
+
     // Reconstruct risk assessment for the latest log/alert
     let latestRisk: RiskAssessment | null = null;
     if (todayLog) {
@@ -114,7 +126,8 @@ export class SentinelService {
         },
         baseline,
         batch,
-        rules
+        rules,
+        weather
       );
     } else if (latestAlert && latestAlert.signalsTriggered) {
       // Use stored alert metadata
@@ -153,6 +166,7 @@ export class SentinelService {
       latestRisk,
       lastCheckinTime,
       isCheckedInToday: Boolean(todayLog),
+      weather,
     };
   }
 
@@ -166,7 +180,7 @@ export class SentinelService {
       throw new Error("No active flock found. Please register or activate a flock first.");
     }
 
-    const { farmer, batch } = context;
+    const { farmer, farm, batch } = context;
 
     // Impossible value guard
     if (input.mortality > batch.currentBirds) {
@@ -194,7 +208,14 @@ export class SentinelService {
     const baseline = calculateBatchBaseline(historicalLogs);
     const rules = await getAlertRulesMap();
 
-    // Compute deterministic risk score
+    // Fetch live weather context for environmental stress evaluation
+    const weather = await weatherService.getWeatherForFarm(
+      farm.latitude,
+      farm.longitude,
+      farmer.district
+    );
+
+    // Compute deterministic risk score factoring shed & ambient heat stress
     const risk = calculateRisk(
       {
         ...input,
@@ -203,11 +224,12 @@ export class SentinelService {
       },
       baseline,
       batch,
-      rules
+      rules,
+      weather
     );
 
     // Prisma Transaction: save log, adjust bird count, create alert & optional case
-    return await prisma.$transaction(
+    const result = await prisma.$transaction(
       async (tx) => {
 
       // 1. Create DailyHealthLog
@@ -250,7 +272,18 @@ export class SentinelService {
           batchId: batch.id,
           severity: severityEnum,
           reason: risk.reasons.join("; ") || "Routine flock status normal",
-          signalsTriggered: JSON.parse(JSON.stringify(risk.signalsTriggered)),
+          signalsTriggered: JSON.parse(
+            JSON.stringify({
+              ...risk.signalsTriggered,
+              ambientWeather: {
+                temp: weather.temp,
+                humidity: weather.humidity,
+                thi: weather.thi,
+                heatRisk: weather.heatRisk,
+                source: weather.source,
+              },
+            })
+          ),
           escalated: risk.severity === "RED",
         },
       });
@@ -310,6 +343,25 @@ export class SentinelService {
         baseline,
       };
     }, { timeout: 25000, maxWait: 15000 });
+
+    // Section 7.3: Automated Multi-Channel Disease Risk Alerts
+    if (risk.severity === "RED") {
+      evaluateRedAlertNotification(
+        farmer.id,
+        result.alert.id,
+        result.alert.reason,
+        risk.signalsTriggered
+      ).catch((err) => console.error("Error dispatching RED alert notification:", err));
+    } else if (risk.severity === "AMBER") {
+      evaluateAmberAlertNotification(
+        farmer.id,
+        result.alert.id,
+        result.alert.reason,
+        risk.signalsTriggered
+      ).catch((err) => console.error("Error dispatching AMBER alert notification:", err));
+    }
+
+    return result;
   }
 
 

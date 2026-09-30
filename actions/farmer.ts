@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { buildBatchEconomicsReport } from "@/lib/economics/calculations";
+import { weatherService } from "@/services/weather.service";
 
 export async function getFarmerDashboardData() {
   const session = await auth();
@@ -132,13 +133,11 @@ export async function getFarmerDashboardData() {
             Math.round((flockDay / (activeBatch.productionType === "BROILER" ? 42 : 72)) * 100)
           ),
         },
-        weather: {
-          temp: 34,
-          condition: "Sunny / ਸਾਫ਼ ਧੁੱਪ",
-          humidity: 46,
-          heatRisk: "MODERATE" as const,
-          recommendation: "Keep roof sprinklers and foggers active from 11:30 AM to 4:30 PM",
-        },
+        weather: await weatherService.getWeatherForFarm(
+          activeFarm.latitude,
+          activeFarm.longitude,
+          farmer.district
+        ),
         economics: {
           totalSpend: report.totalBatchCost.value ?? 0,
           totalRevenue: report.revenue.value ?? 0,
@@ -163,13 +162,11 @@ export async function getFarmerDashboardData() {
       recentAlerts: [],
       recentLogs: [],
       flockCycle: null,
-      weather: {
-        temp: 32,
-        condition: "Clear",
-        humidity: 50,
-        heatRisk: "LOW" as const,
-        recommendation: "Normal ambient ventilation",
-      },
+      weather: await weatherService.getWeatherForFarm(
+        activeFarm?.latitude,
+        activeFarm?.longitude,
+        farmer.district
+      ),
       economics: {
         totalSpend: 0,
         totalRevenue: 0,
