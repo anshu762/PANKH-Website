@@ -1,8 +1,19 @@
 import { auth } from "@/auth";
-import { AdminDashboardView } from "@/components/admin/admin-dashboard-view";
+import { adminService } from "@/services/admin.service";
+import { AdminOverviewView } from "@/components/admin/admin-overview-view";
 
 export default async function AdminDashboardPage() {
-  const session = await auth();
+  const [stats, alerts, aiReviews] = await Promise.all([
+    adminService.getAdminOverviewStats(),
+    adminService.getHighRiskAlertsQueue("RED"),
+    adminService.getAiReviewQueue(),
+  ]);
 
-  return <AdminDashboardView session={session} />;
+  return (
+    <AdminOverviewView
+      stats={stats}
+      recentAlerts={alerts}
+      recentAiFeedback={aiReviews}
+    />
+  );
 }
