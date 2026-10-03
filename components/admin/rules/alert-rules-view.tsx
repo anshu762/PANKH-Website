@@ -14,6 +14,8 @@ import {
   Clock,
   User,
   AlertTriangle,
+  ShieldCheck,
+  Check,
 } from "lucide-react";
 import { AdminAlertRuleItem } from "@/types/admin";
 import { updateAlertRuleAction } from "@/actions/admin";
@@ -21,6 +23,25 @@ import { cn } from "@/lib/utils";
 
 interface AlertRulesViewProps {
   initialRules: AdminAlertRuleItem[];
+}
+
+function getRuleMeta(thresholdKey: string): { unit: string; description: string } {
+  if (thresholdKey.includes("MORTALITY")) {
+    return { unit: "%", description: "Daily flock mortality percentage threshold" };
+  }
+  if (thresholdKey.includes("PERCENT") || thresholdKey.includes("DROP")) {
+    return { unit: "%", description: "Percentage deviation drop compared to expected baseline" };
+  }
+  if (thresholdKey.includes("CELSIUS") || thresholdKey.includes("TEMP")) {
+    return { unit: "°C", description: "Shed ambient temperature limit" };
+  }
+  if (thresholdKey.includes("WEIGHT")) {
+    return { unit: "pts", description: "Engine weight contribution in risk scoring formula" };
+  }
+  if (thresholdKey.includes("THRESHOLD") || thresholdKey.includes("SCORE")) {
+    return { unit: "pts", description: "Composite risk score trigger boundary (0-100)" };
+  }
+  return { unit: "", description: "Sentinel risk evaluation parameter" };
 }
 
 export function AlertRulesView({ initialRules }: AlertRulesViewProps) {
@@ -63,7 +84,7 @@ export function AlertRulesView({ initialRules }: AlertRulesViewProps) {
               id: "temp-" + Date.now(),
               previousValue: r.thresholdValue,
               newValue: val,
-              changedBy: "You (Admin)",
+              changedBy: "Operations Admin",
               changedAt: nowIso,
             };
             return {
@@ -92,328 +113,300 @@ export function AlertRulesView({ initialRules }: AlertRulesViewProps) {
   ).sort((a, b) => new Date(b.changedAt).getTime() - new Date(a.changedAt).getTime());
 
   return (
-    <div className="space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-5">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground font-serif">
-              Sentinel Risk Rules & Engine Thresholds
-            </h1>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">
-              Audit-Enforced
-            </span>
-          </div>
-          <p className="text-sm text-muted-foreground mt-1">
-            Configure risk trigger limits for automated disease alerts. Every change is immutably logged to AlertRuleHistory.
+    <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-300">
+      {/* 1. Protocol Notice */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-amber-50/60 border border-amber-200 shadow-2xs flex items-start gap-3">
+        <ShieldCheck className="h-5 w-5 text-amber-800 shrink-0 mt-0.5" />
+        <div className="space-y-1 text-xs text-amber-950">
+          <p className="font-bold font-serif text-sm">
+            Sentinel Biosecurity Governance & Immutable Audit Logging
+          </p>
+          <p className="leading-relaxed text-stone-700">
+            Threshold adjustments directly alter the automated disease risk scoring pipeline across all registered poultry sheds in Punjab.
+            Every modification is immutably timestamped in the audit log for clinical verification.
           </p>
         </div>
+      </div>
 
-        {/* View Switcher Tabs */}
-        <div className="flex items-center gap-1.5 p-1 bg-muted/60 border border-border rounded-lg text-sm">
+      {/* 2. Top Header & Tab Switcher */}
+      <div className="p-4 rounded-2xl bg-white border border-stone-200/90 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5">
+          <div className="h-8 w-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-800">
+            <Sliders className="h-4 w-4" />
+          </div>
+          <div>
+            <h3 className="font-serif text-base font-bold text-pankh-clay">
+              Sentinel Risk Rules & Engine Thresholds
+            </h3>
+            <p className="text-[11px] text-stone-500">
+              Deterministic rule limits evaluated before AI synthesis
+            </p>
+          </div>
+        </div>
+
+        {/* Tab Controls */}
+        <div className="inline-flex rounded-xl bg-stone-100 p-1 text-xs font-semibold border border-stone-200/80">
           <button
+            type="button"
             onClick={() => setActiveTab("rules")}
             className={cn(
-              "flex items-center gap-2 px-3 py-1.5 rounded-md font-medium transition-colors",
+              "px-3 py-1.5 rounded-lg transition-all cursor-pointer font-mono text-[11px] flex items-center gap-1.5",
               activeTab === "rules"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-white text-pankh-clay shadow-2xs font-bold"
+                : "text-stone-600 hover:text-stone-900"
             )}
           >
-            <Sliders className="w-4 h-4" />
-            Active Thresholds ({rules.length})
+            <Sliders className="h-3 w-3 text-amber-800" />
+            <span>Active Thresholds ({rules.length})</span>
           </button>
+
           <button
+            type="button"
             onClick={() => setActiveTab("history")}
             className={cn(
-              "flex items-center gap-2 px-3 py-1.5 rounded-md font-medium transition-colors",
+              "px-3 py-1.5 rounded-lg transition-all cursor-pointer font-mono text-[11px] flex items-center gap-1.5",
               activeTab === "history"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-white text-pankh-clay shadow-2xs font-bold"
+                : "text-stone-600 hover:text-stone-900"
             )}
           >
-            <History className="w-4 h-4" />
-            Audit Trail ({allHistory.length})
+            <History className="h-3 w-3 text-amber-800" />
+            <span>Audit Trail Log ({allHistory.length})</span>
           </button>
         </div>
       </div>
 
-      {/* Safety Policy Notice */}
-      <div className="p-4 rounded-lg bg-primary/5 border border-primary/20 flex items-start gap-3 text-xs sm:text-sm text-foreground">
-        <Info className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-        <div>
-          <span className="font-semibold text-primary">Veterinary Protocol Compliance: </span>
-          Adjusting these parameters changes the sensitivity of the early warning system across all registered poultry farms.
-          Lowering thresholds increases early alerts; raising them requires greater mortality or drop in feed/water to trigger Sentinel escalation.
-        </div>
-      </div>
-
-      {/* Main Tab Content */}
+      {/* 3. Main Content: Rules Grid or History Log */}
       {activeTab === "rules" ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {rules.length === 0 ? (
-            <div className="col-span-full py-16 text-center text-muted-foreground border border-dashed border-border rounded-xl">
-              <ShieldAlert className="w-10 h-10 mx-auto opacity-30 mb-2" />
-              <p className="text-base font-medium">No Sentinel rules registered in database</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Run database seed or execute Sentinel migrations to initialize rules.
-              </p>
-            </div>
-          ) : (
-            rules.map((rule) => {
-              const lastChange = rule.history[0];
-              const isRedTrigger = rule.name.toLowerCase().includes("red") || rule.thresholdKey.includes("red");
+          {rules.map((rule) => {
+            const isRedTrigger = rule.name.toLowerCase().includes("red") || rule.thresholdKey.includes("red");
+            const lastChange = rule.history[0];
+            const meta = getRuleMeta(rule.thresholdKey);
 
-              return (
-                <div
-                  key={rule.id}
-                  className="rounded-xl border border-border bg-card p-5 flex flex-col justify-between hover:border-primary/40 transition-colors shadow-sm"
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="space-y-1">
-                        <span
-                          className={cn(
-                            "text-[10px] font-mono uppercase px-2 py-0.5 rounded font-semibold",
-                            isRedTrigger
-                              ? "bg-red-500/10 text-red-500 border border-red-500/20"
-                              : "bg-amber-500/10 text-amber-500 border border-amber-500/20"
-                          )}
-                        >
-                          {rule.thresholdKey}
-                        </span>
-                        <h3 className="font-semibold text-foreground text-sm leading-snug pt-1">
-                          {rule.name}
-                        </h3>
-                      </div>
-                      <span className="inline-flex items-center text-[10px] px-2 py-0.5 rounded bg-muted text-muted-foreground font-mono">
-                        {rule.editable ? "Editable" : "Locked"}
-                      </span>
-                    </div>
-
-                    {/* Threshold Value Display */}
-                    <div className="pt-2 pb-1 border-y border-border/50 flex items-baseline justify-between">
-                      <span className="text-xs text-muted-foreground">Trigger Value:</span>
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-3xl font-mono font-bold text-foreground tracking-tight">
-                          {rule.thresholdValue}
-                        </span>
-                        <span className="text-xs text-muted-foreground font-medium">
-                          {rule.thresholdKey.includes("pct") || rule.thresholdKey.includes("drop") || rule.thresholdKey.includes("mortality") ? "%" : "pts"}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Last Change Audit Summary */}
-                    <div className="text-xs space-y-1 text-muted-foreground">
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-muted-foreground/70" />
-                        <span>Last updated: {new Date(rule.updatedAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short", year: "numeric" })}</span>
-                      </div>
-                      {rule.updatedBy && (
-                        <div className="flex items-center gap-1.5 truncate">
-                          <User className="w-3.5 h-3.5 text-muted-foreground/70" />
-                          <span className="truncate">By: {rule.updatedBy}</span>
-                        </div>
-                      )}
-                      {lastChange && (
-                        <div className="text-[11px] text-muted-foreground/80 font-mono pt-1">
-                          Previous: {lastChange.previousValue} → {lastChange.newValue}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Action button */}
-                  <div className="pt-4 mt-3 border-t border-border flex items-center justify-between">
-                    <span className="text-[11px] text-muted-foreground">
-                      {rule.history.length} audit {rule.history.length === 1 ? "entry" : "entries"}
-                    </span>
-                    <button
-                      onClick={() => handleOpenEdit(rule)}
-                      disabled={!rule.editable}
+            return (
+              <div
+                key={rule.id}
+                className="p-5 rounded-3xl bg-white border border-stone-200/90 hover:border-amber-300/80 shadow-2xs transition-all space-y-4 flex flex-col justify-between"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <span
                       className={cn(
-                        "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border shadow-sm",
-                        rule.editable
-                          ? "bg-primary text-primary-foreground hover:bg-primary/90 border-transparent"
-                          : "bg-muted text-muted-foreground border-border cursor-not-allowed opacity-60"
+                        "text-[9px] font-mono px-2 py-0.5 rounded-md font-bold uppercase border",
+                        isRedTrigger
+                          ? "bg-red-100 text-red-900 border-red-300"
+                          : "bg-amber-100 text-amber-900 border-amber-300"
                       )}
                     >
-                      <Edit2 className="w-3.5 h-3.5" />
-                      Edit Threshold
-                    </button>
+                      {rule.thresholdKey}
+                    </span>
+
+                    <span className="text-[10px] font-mono text-stone-500">
+                      {rule.editable ? "CONFIGURABLE" : "LOCKED"}
+                    </span>
+                  </div>
+
+                  <div>
+                    <h4 className="font-serif font-bold text-base text-pankh-clay leading-snug">
+                      {rule.name}
+                    </h4>
+                    <p className="text-[11px] text-stone-500 mt-1 line-clamp-2 leading-relaxed">
+                      {meta.description}
+                    </p>
+                  </div>
+
+                  {/* Trigger value badge */}
+                  <div className="p-3 rounded-2xl bg-[#FAF9F5] border border-stone-200/80 flex items-baseline justify-between">
+                    <span className="text-xs text-stone-500 font-mono">Trigger Threshold:</span>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-3xl font-mono font-bold text-pankh-clay">
+                        {rule.thresholdValue}
+                      </span>
+                      <span className="text-xs font-mono text-stone-600 font-bold">
+                        {meta.unit}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              );
-            })
-          )}
+
+                {/* Card Footer with Audit Meta & Edit Button */}
+                <div className="pt-3 border-t border-stone-100 flex items-center justify-between gap-2">
+                  <div className="text-[10px] font-mono text-stone-400 truncate">
+                    {lastChange ? (
+                      <span>Updated {new Date(lastChange.changedAt).toLocaleDateString()}</span>
+                    ) : (
+                      <span>Baseline default</span>
+                    )}
+                  </div>
+
+                  {rule.editable && (
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEdit(rule)}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-950 font-bold text-xs border border-amber-300 transition-colors shadow-2xs cursor-pointer"
+                    >
+                      <Edit2 className="h-3 w-3 text-amber-800" />
+                      <span>Configure</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       ) : (
-        /* Complete Audit History Table */
-        <div className="rounded-xl border border-border bg-card overflow-hidden shadow-sm">
-          <div className="p-4 border-b border-border bg-muted/20 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
-              <History className="w-4 h-4 text-primary" />
-              Complete Alert Rule History Audit Log
-            </h2>
-            <span className="text-xs text-muted-foreground font-mono">
-              Total {allHistory.length} audit records
-            </span>
+        /* Audit Trail History Table */
+        <div className="p-5 sm:p-6 rounded-3xl bg-white border border-stone-200/90 shadow-2xs space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <History className="h-4 w-4 text-amber-800" />
+              <h3 className="font-serif text-base font-bold text-pankh-clay">
+                Immutable Rule Audit Trail Log ({allHistory.length})
+              </h3>
+            </div>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-muted/40 border-b border-border text-muted-foreground uppercase font-mono text-[11px]">
-                <tr>
-                  <th className="px-4 py-3">Timestamp (IST)</th>
-                  <th className="px-4 py-3">Rule Name & Key</th>
-                  <th className="px-4 py-3">Change Transition</th>
-                  <th className="px-4 py-3">Authorized Admin</th>
+              <thead>
+                <tr className="border-b border-stone-200 text-stone-500 font-bold uppercase tracking-wider text-[10px] font-mono">
+                  <th className="py-3 px-3">Rule Name</th>
+                  <th className="py-3 px-3">Threshold Key</th>
+                  <th className="py-3 px-3">Change Transition</th>
+                  <th className="py-3 px-3">Auditor</th>
+                  <th className="py-3 px-3 text-right">Timestamp (IST)</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
-                {allHistory.length === 0 ? (
-                  <tr>
-                    <td colSpan={4} className="py-12 text-center text-muted-foreground">
-                      No historical updates logged yet. Changes will record automatically.
+              <tbody className="divide-y divide-stone-100 font-mono text-xs">
+                {allHistory.map((item) => (
+                  <tr key={item.id} className="hover:bg-[#FAF9F5]/70 transition-colors">
+                    <td className="py-3.5 px-3 font-sans font-bold text-pankh-clay">
+                      {item.ruleName}
+                    </td>
+                    <td className="py-3.5 px-3">
+                      <span className="px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 text-[10px]">
+                        {item.thresholdKey}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-3">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-stone-400 line-through">
+                          {item.previousValue}
+                        </span>
+                        <ArrowRight className="h-3 w-3 text-stone-400" />
+                        <span className="font-bold text-amber-800">
+                          {item.newValue}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-3.5 px-3 text-stone-700">
+                      {item.changedBy}
+                    </td>
+                    <td className="py-3.5 px-3 text-right text-stone-500 text-[11px]">
+                      {new Date(item.changedAt).toLocaleString("en-IN", {
+                        timeZone: "Asia/Kolkata",
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      })}
                     </td>
                   </tr>
-                ) : (
-                  allHistory.map((item) => (
-                    <tr key={item.id} className="hover:bg-muted/20 transition-colors">
-                      <td className="px-4 py-3 text-muted-foreground font-mono whitespace-nowrap">
-                        {new Date(item.changedAt).toLocaleString("en-IN", {
-                          timeZone: "Asia/Kolkata",
-                          dateStyle: "medium",
-                          timeStyle: "short",
-                        })}
-                      </td>
-                      <td className="px-4 py-3 font-medium text-foreground">
-                        <div>{item.ruleName}</div>
-                        <div className="text-[10px] font-mono text-muted-foreground">
-                          {item.thresholdKey}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2 font-mono">
-                          <span className="px-2 py-0.5 rounded bg-muted text-muted-foreground font-semibold">
-                            {item.previousValue}
-                          </span>
-                          <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
-                          <span className="px-2 py-0.5 rounded bg-primary/10 text-primary font-bold border border-primary/20">
-                            {item.newValue}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 font-mono text-foreground">
-                        {item.changedBy}
-                      </td>
-                    </tr>
-                  ))
-                )}
+                ))}
               </tbody>
             </table>
           </div>
         </div>
       )}
 
-      {/* Edit Modal */}
-      {editingRule && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
-          <div className="bg-card border border-border rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="p-4 border-b border-border flex items-center justify-between bg-muted/30">
-              <div className="flex items-center gap-2">
-                <Sliders className="w-4 h-4 text-primary" />
-                <h3 className="font-semibold text-foreground text-sm">
-                  Update Sentinel Risk Threshold
-                </h3>
+      {/* 4. Edit Threshold Modal */}
+      {editingRule && (() => {
+        const editingMeta = getRuleMeta(editingRule.thresholdKey);
+        return (
+          <div className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
+            <div className="bg-[#FAF9F5] rounded-3xl max-w-md w-full p-6 sm:p-7 space-y-5 shadow-2xl border border-stone-300 animate-in zoom-in-95 duration-200">
+              <div className="flex items-center justify-between pb-3 border-b border-stone-200">
+                <div className="flex items-center gap-2">
+                  <Sliders className="h-5 w-5 text-amber-800" />
+                  <h3 className="font-serif font-bold text-base text-pankh-clay">
+                    Configure Risk Threshold
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEditingRule(null)}
+                  className="h-8 w-8 rounded-lg hover:bg-stone-200 flex items-center justify-center text-stone-600 cursor-pointer"
+                >
+                  <X className="h-4 w-4" />
+                </button>
               </div>
-              <button
-                onClick={() => setEditingRule(null)}
-                className="text-muted-foreground hover:text-foreground p-1 rounded-md"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
 
-            <form onSubmit={handleSaveThreshold} className="p-5 space-y-4">
+              <form onSubmit={handleSaveThreshold} className="space-y-4">
+                <div>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-stone-100 text-stone-700 font-bold uppercase">
+                    {editingRule.thresholdKey}
+                  </span>
+                  <h4 className="font-serif font-bold text-base text-pankh-clay mt-1">
+                    {editingRule.name}
+                  </h4>
+                  <p className="text-xs text-stone-500 mt-1 leading-relaxed">
+                    {editingMeta.description}
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-2xs space-y-2">
+                  <label className="text-xs font-bold text-stone-700 font-mono uppercase block">
+                    New Threshold Limit ({editingMeta.unit})
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      step="any"
+                      required
+                      value={newValueInput}
+                      onChange={(e) => setNewValueInput(e.target.value)}
+                      className="flex-1 p-2.5 rounded-xl bg-stone-50 border border-stone-300 text-base font-mono font-bold focus:ring-2 focus:ring-amber-500"
+                    />
+                    <span className="text-xs font-mono font-bold text-stone-500">
+                      {editingMeta.unit}
+                    </span>
+                  </div>
+                </div>
+
               {feedbackMsg && (
                 <div
                   className={cn(
-                    "p-3 rounded-lg text-xs font-medium border flex items-center gap-2",
+                    "p-3 rounded-xl text-xs font-semibold",
                     feedbackMsg.type === "error"
-                      ? "bg-red-500/10 text-red-500 border-red-500/20"
-                      : "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                      ? "bg-red-50 text-red-900 border border-red-200"
+                      : "bg-emerald-50 text-emerald-900 border border-emerald-200"
                   )}
                 >
-                  <AlertTriangle className="w-4 h-4 flex-shrink-0" />
                   {feedbackMsg.text}
                 </div>
               )}
 
-              <div className="space-y-1">
-                <label className="text-xs font-medium text-muted-foreground">Rule Name</label>
-                <div className="text-sm font-semibold text-foreground">
-                  {editingRule.name}
-                </div>
-                <div className="text-[11px] font-mono text-muted-foreground">
-                  Key: {editingRule.thresholdKey}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 pt-2">
-                <div className="p-3 bg-muted/40 rounded-lg border border-border text-center">
-                  <span className="text-[10px] font-mono uppercase text-muted-foreground block">
-                    Current Threshold
-                  </span>
-                  <span className="text-xl font-mono font-bold text-foreground">
-                    {editingRule.thresholdValue}
-                  </span>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-mono uppercase text-muted-foreground block">
-                    New Threshold
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    required
-                    value={newValueInput}
-                    onChange={(e) => setNewValueInput(e.target.value)}
-                    className="w-full px-3 py-2 text-center text-lg font-mono font-bold rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-                    placeholder="e.g. 2.5"
-                    autoFocus
-                  />
-                </div>
-              </div>
-
-              <div className="p-3 bg-amber-500/5 rounded-lg border border-amber-500/20 text-[11px] text-amber-500">
-                Notice: Modifying this value immediately takes effect for all active batches and records an immutable entry with your admin identity.
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-border">
+              <div className="flex items-center justify-end gap-2.5 pt-2">
                 <button
                   type="button"
                   onClick={() => setEditingRule(null)}
-                  disabled={isSubmitting}
-                  className="px-3 py-2 text-xs font-medium border border-border rounded-lg text-foreground hover:bg-muted"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:bg-stone-200 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-2xs disabled:opacity-50 cursor-pointer"
                 >
-                  <Save className="w-3.5 h-3.5" />
-                  {isSubmitting ? "Saving..." : "Confirm & Log Change"}
+                  <Save className="h-4 w-4" />
+                  <span>{isSubmitting ? "Updating..." : "Save & Log Change"}</span>
                 </button>
               </div>
             </form>
           </div>
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

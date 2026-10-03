@@ -9,6 +9,14 @@ export default async function FarmOnboardingPage() {
     redirect("/login?callbackUrl=/onboarding/farm");
   }
 
+  const role = session.user.role;
+  if (role === "ADMIN" || role === "SUPER_ADMIN") {
+    redirect("/admin");
+  }
+  if (role === "VET") {
+    redirect("/vet");
+  }
+
   const farmer = await prisma.farmer.findUnique({
     where: { userId: session.user.id },
     include: {

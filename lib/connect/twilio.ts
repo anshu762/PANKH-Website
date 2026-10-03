@@ -35,6 +35,7 @@ export async function sendTwilioMessage(
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
   const authToken = process.env.TWILIO_AUTH_TOKEN;
   const twilioWhatsAppNumber = process.env.TWILIO_WHATSAPP_NUMBER || "+14155238886";
+  const twilioWhatsAppFrom = process.env.TWILIO_WHATSAPP_FROM;
   const twilioSmsNumber = process.env.TWILIO_PHONE_NUMBER;
 
   const isConfigured =
@@ -68,7 +69,9 @@ export async function sendTwilioMessage(
   try {
     const fromAddress =
       channel === "WHATSAPP"
-        ? `whatsapp:${normalizeE164Phone(twilioWhatsAppNumber)}`
+        ? (twilioWhatsAppFrom
+            ? (twilioWhatsAppFrom.startsWith("whatsapp:") ? twilioWhatsAppFrom : `whatsapp:${normalizeE164Phone(twilioWhatsAppFrom)}`)
+            : `whatsapp:${normalizeE164Phone(twilioWhatsAppNumber)}`)
         : normalizeE164Phone(twilioSmsNumber || twilioWhatsAppNumber);
 
     const toAddress =
@@ -118,7 +121,7 @@ export async function sendTwilioMessage(
         recipientPhone: recipient,
         error: result.message || "Twilio dispatch failed",
         sandboxNotice:
-          "WhatsApp delivery failed. If using Twilio Sandbox, recipient must send sandbox join code to +14155238886 first.",
+          `WhatsApp delivery failed. If using Twilio Sandbox, recipient must send sandbox join code to ${twilioWhatsAppNumber} first.`,
       };
     }
 

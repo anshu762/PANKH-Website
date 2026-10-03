@@ -15,6 +15,9 @@ import {
   Check,
   X,
   ExternalLink,
+  ShieldAlert,
+  ArrowRight,
+  Info,
 } from "lucide-react";
 import { AdminAiReviewItem } from "@/types/admin";
 import { markAiMessageReviewedAction } from "@/actions/admin";
@@ -80,122 +83,139 @@ export function AiReviewView({ initialMessages }: AiReviewViewProps) {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-5">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground font-serif">
-              AI Safety & Grounding Review Queue
-            </h1>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
-              Brief Sec 8.6
+    <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-300">
+      {/* 1. Header & Strict Compliance Notice */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-amber-50/60 border border-amber-200 shadow-2xs flex items-start gap-3">
+        <ShieldCheck className="h-5 w-5 text-amber-800 shrink-0 mt-0.5" />
+        <div className="space-y-1 text-xs text-amber-950">
+          <p className="font-bold font-serif text-sm">
+            Hard Safety Rule 1 & 2 Auditing Protocol
+          </p>
+          <p className="leading-relaxed text-stone-700">
+            Pankh AI is strictly forbidden from claiming confirmed disease diagnoses. Every answer must follow the 6-part structure:
+            <strong> Answer → Why → What to do now → Ask → Escalate → Source</strong>. Ensure citations came from actual GADVASU/ICAR retrieval.
+          </p>
+        </div>
+      </div>
+
+      {/* 2. KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="p-5 rounded-3xl bg-white border border-stone-200/90 shadow-2xs space-y-1.5">
+          <div className="flex items-center justify-between text-stone-500">
+            <span className="text-[11px] font-bold uppercase tracking-wider font-mono text-red-900">
+              Negative Feedback
             </span>
+            <AlertTriangle className="h-4 w-4 text-red-600" />
           </div>
-          <p className="text-sm text-muted-foreground mt-1">
-            Audit AI assistant answers, verify knowledge base retrieval traces, and triage negative farmer feedback.
+          <div className="text-3xl font-bold font-mono text-red-700">
+            {negativeCount}
+          </div>
+          <p className="text-[11px] text-stone-500">
+            "Not helpful" or farmer follow-up flags
           </p>
         </div>
 
-        {/* Search */}
-        <div className="relative w-full sm:w-64">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search answers or sources..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-border bg-background focus:outline-none focus:ring-1 focus:ring-primary"
-          />
-        </div>
-      </div>
-
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-4 rounded-xl border border-red-500/20 bg-red-500/5 flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-xs font-semibold text-red-500 uppercase tracking-wider font-mono">
-              Negative Farmer Feedback
+        <div className="p-5 rounded-3xl bg-white border border-stone-200/90 shadow-2xs space-y-1.5">
+          <div className="flex items-center justify-between text-stone-500">
+            <span className="text-[11px] font-bold uppercase tracking-wider font-mono text-emerald-900">
+              RAG Grounding Rate
             </span>
-            <div className="text-2xl font-mono font-bold text-foreground">{negativeCount}</div>
-            <p className="text-[11px] text-muted-foreground">"Not helpful" or "Problem continuing"</p>
+            <ShieldCheck className="h-4 w-4 text-emerald-600" />
           </div>
-          <AlertTriangle className="w-8 h-8 text-red-500/40" />
+          <div className="text-3xl font-bold font-mono text-emerald-700">
+            {groundedRate}%
+          </div>
+          <p className="text-[11px] text-stone-500">
+            {groundedCount} of {messages.length} grounded in approved sources
+          </p>
         </div>
 
-        <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider font-mono">
-              RAG Grounding Trace Rate
-            </span>
-            <div className="text-2xl font-mono font-bold text-foreground">{groundedRate}%</div>
-            <p className="text-[11px] text-muted-foreground">{groundedCount} of {messages.length} grounded in approved sources</p>
-          </div>
-          <ShieldCheck className="w-8 h-8 text-emerald-500/40" />
-        </div>
-
-        <div className="p-4 rounded-xl border border-border bg-card flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">
+        <div className="p-5 rounded-3xl bg-white border border-stone-200/90 shadow-2xs space-y-1.5">
+          <div className="flex items-center justify-between text-stone-500">
+            <span className="text-[11px] font-bold uppercase tracking-wider font-mono text-amber-900">
               Total Audited Sample
             </span>
-            <div className="text-2xl font-mono font-bold text-foreground">{messages.length}</div>
-            <p className="text-[11px] text-muted-foreground">Recent assistant messages sampled</p>
+            <Sparkles className="h-4 w-4 text-amber-700" />
           </div>
-          <Sparkles className="w-8 h-8 text-muted-foreground/30" />
+          <div className="text-3xl font-bold font-mono text-pankh-clay">
+            {messages.length}
+          </div>
+          <p className="text-[11px] text-stone-500">
+            Recent farmer queries & assistant responses
+          </p>
         </div>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="flex items-center gap-2 border-b border-border pb-3">
-        <button
-          onClick={() => setFilterMode("negative")}
-          className={cn(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
-            filterMode === "negative"
-              ? "bg-red-500 text-white font-semibold shadow-sm"
-              : "text-muted-foreground hover:bg-muted"
-          )}
-        >
-          <AlertTriangle className="w-3.5 h-3.5" />
-          Negative Feedback Queue ({negativeCount})
-        </button>
-        <button
-          onClick={() => setFilterMode("all")}
-          className={cn(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
-            filterMode === "all"
-              ? "bg-primary text-primary-foreground font-semibold shadow-sm"
-              : "text-muted-foreground hover:bg-muted"
-          )}
-        >
-          <MessageSquare className="w-3.5 h-3.5" />
-          All AI Conversations ({messages.length})
-        </button>
-        <button
-          onClick={() => setFilterMode("flagged")}
-          className={cn(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
-            filterMode === "flagged"
-              ? "bg-amber-500 text-white font-semibold shadow-sm"
-              : "text-muted-foreground hover:bg-muted"
-          )}
-        >
-          <Flag className="w-3.5 h-3.5" />
-          Flagged Unsafe
-        </button>
+      {/* 3. Search & Filter Bar */}
+      <div className="p-4 rounded-2xl bg-white border border-stone-200/90 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        {/* Search */}
+        <div className="relative flex-1 max-w-md">
+          <Search className="h-4 w-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            placeholder="Search answers, farmer name, or cited sources..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-4 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-amber-500 font-sans"
+          />
+        </div>
+
+        {/* Filter Tabs */}
+        <div className="inline-flex rounded-xl bg-stone-100 p-1 text-xs font-semibold border border-stone-200/80">
+          <button
+            type="button"
+            onClick={() => setFilterMode("negative")}
+            className={cn(
+              "px-3 py-1.5 rounded-lg transition-all cursor-pointer font-mono text-[11px] flex items-center gap-1.5",
+              filterMode === "negative"
+                ? "bg-red-600 text-white shadow-2xs font-bold"
+                : "text-stone-600 hover:text-stone-900"
+            )}
+          >
+            <AlertTriangle className="h-3 w-3" />
+            <span>Negative Queue ({negativeCount})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilterMode("all")}
+            className={cn(
+              "px-3 py-1.5 rounded-lg transition-all cursor-pointer font-mono text-[11px] flex items-center gap-1.5",
+              filterMode === "all"
+                ? "bg-white text-pankh-clay shadow-2xs font-bold"
+                : "text-stone-600 hover:text-stone-900"
+            )}
+          >
+            <MessageSquare className="h-3 w-3" />
+            <span>All Messages ({messages.length})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilterMode("flagged")}
+            className={cn(
+              "px-3 py-1.5 rounded-lg transition-all cursor-pointer font-mono text-[11px] flex items-center gap-1.5",
+              filterMode === "flagged"
+                ? "bg-amber-600 text-white shadow-2xs font-bold"
+                : "text-stone-600 hover:text-stone-900"
+            )}
+          >
+            <Flag className="h-3 w-3" />
+            <span>Flagged Unsafe</span>
+          </button>
+        </div>
       </div>
 
-      {/* Review Queue List */}
+      {/* 4. Messages Queue List */}
       <div className="space-y-4">
         {filteredMessages.length === 0 ? (
-          <div className="py-16 text-center text-muted-foreground border border-dashed border-border rounded-xl">
-            <ShieldCheck className="w-10 h-10 mx-auto text-emerald-500/40 mb-2" />
-            <p className="text-base font-medium">No AI responses pending review in this view</p>
-            <p className="text-xs text-muted-foreground mt-1">
+          <div className="py-16 text-center text-xs text-stone-400 bg-white rounded-3xl border border-stone-200/90 shadow-2xs space-y-2">
+            <CheckCircle2 className="h-9 w-9 text-emerald-600 mx-auto" />
+            <p className="text-sm font-bold text-stone-700 font-serif">
+              No AI responses pending review in this view
+            </p>
+            <p className="text-stone-500">
               {filterMode === "negative"
-                ? "No negative farmer feedback reported currently."
-                : "Try adjusting your search or filter criteria."}
+                ? "Zero negative farmer feedback reported currently."
+                : "No messages matching your search criteria."}
             </p>
           </div>
         ) : (
@@ -203,114 +223,111 @@ export function AiReviewView({ initialMessages }: AiReviewViewProps) {
             <div
               key={item.id}
               className={cn(
-                "rounded-xl border p-5 bg-card transition-all shadow-sm space-y-4",
+                "p-5 sm:p-6 rounded-3xl border bg-white shadow-2xs space-y-4 transition-all",
                 item.isNegativeFeedback
-                  ? "border-red-500/40 bg-red-500/[0.02]"
-                  : "border-border hover:border-primary/40"
+                  ? "border-red-300/80 hover:border-red-400"
+                  : "border-stone-200/90 hover:border-stone-300"
               )}
             >
-              {/* Top metadata row */}
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
+              {/* Header row */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-stone-100">
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1.5 font-medium text-xs text-foreground">
-                    <span>{item.farmerName}</span>
+                  <div className="h-7 w-7 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-800 font-serif font-bold text-xs flex items-center justify-center">
+                    {item.farmerName.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <span className="font-bold text-sm text-pankh-clay font-serif">
+                      {item.farmerName}
+                    </span>
                     {item.farmerPhone && (
-                      <span className="text-muted-foreground font-mono text-[11px]">
+                      <span className="text-stone-400 font-mono text-[11px] ml-1.5">
                         ({item.farmerPhone})
                       </span>
                     )}
                   </div>
-                  <span className="text-[11px] text-muted-foreground font-mono">
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-stone-500 font-mono">
                     {new Date(item.createdAt).toLocaleString("en-IN", {
                       timeZone: "Asia/Kolkata",
                       dateStyle: "medium",
                       timeStyle: "short",
                     })}
                   </span>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-muted text-muted-foreground">
+
+                  <span className="px-2 py-0.5 rounded text-[9px] font-mono uppercase bg-stone-100 text-stone-700 border border-stone-200 font-bold">
                     Mode: {item.inputMode}
                   </span>
-                </div>
 
-                {/* Feedback / Review Status Badge */}
-                <div className="flex items-center gap-2">
-                  {item.feedback ? (
+                  {item.feedback && (
                     <span
                       className={cn(
-                        "px-2.5 py-0.5 rounded-full text-xs font-semibold flex items-center gap-1 font-mono",
+                        "px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono border",
                         item.feedback.includes("FLAGGED")
-                          ? "bg-red-500/10 text-red-500 border border-red-500/20"
+                          ? "bg-red-100 text-red-900 border-red-300"
                           : item.feedback.includes("REVIEWED")
-                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
-                          : "bg-amber-500/10 text-amber-500 border border-amber-500/20"
+                          ? "bg-emerald-100 text-emerald-900 border-emerald-300"
+                          : "bg-amber-100 text-amber-900 border-amber-300"
                       )}
                     >
-                      {item.feedback.includes("FLAGGED") ? (
-                        <Flag className="w-3 h-3" />
-                      ) : item.feedback.includes("REVIEWED") ? (
-                        <CheckCircle2 className="w-3 h-3" />
-                      ) : (
-                        <AlertTriangle className="w-3 h-3" />
-                      )}
                       {item.feedback}
-                    </span>
-                  ) : (
-                    <span className="px-2 py-0.5 rounded text-[10px] text-muted-foreground bg-muted font-mono">
-                      No Farmer Feedback
                     </span>
                   )}
                 </div>
               </div>
 
               {/* Message Content */}
-              <div className="text-xs sm:text-sm text-foreground whitespace-pre-wrap leading-relaxed bg-muted/20 p-3.5 rounded-lg border border-border/50 font-sans">
-                {item.content}
+              <div className="p-4 rounded-2xl bg-[#FAF9F5] border border-stone-200/90 text-xs sm:text-sm text-stone-800 leading-relaxed font-sans space-y-2">
+                <div className="text-[10px] font-mono uppercase text-stone-500 font-bold">
+                  Assistant Response to Farmer
+                </div>
+                <div className="whitespace-pre-wrap">{item.content}</div>
               </div>
 
-              {/* Source Trace (RAG Grounding) */}
-              <div className="space-y-1.5 pt-1">
-                <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider font-mono flex items-center gap-1.5">
-                  <BookOpen className="w-3.5 h-3.5 text-primary" />
-                  RAG Grounding Trace ({item.sourceIds.length} Sources Retained)
-                </span>
-                {item.sourceTitles.length > 0 ? (
-                  <div className="flex flex-wrap gap-1.5">
-                    {item.sourceTitles.map((title, idx) => (
-                      <span
-                        key={idx}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] bg-primary/10 text-primary border border-primary/20 font-medium"
-                      >
-                        <BookOpen className="w-3 h-3 opacity-70" />
-                        {title}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-[11px] text-amber-500 font-mono italic">
-                    ⚠️ No KnowledgeSource IDs recorded for this generation (un-grounded or general chitchat)
-                  </div>
-                )}
-              </div>
+              {/* Citations Grounding Trace */}
+              <div className="flex flex-wrap items-center justify-between gap-3 text-xs pt-1">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-3.5 w-3.5 text-amber-800" />
+                  <span className="text-[11px] font-bold text-stone-600 font-mono">
+                    Retrieved Knowledge Sources ({item.sourceTitles.length}):
+                  </span>
+                  {item.sourceTitles.length > 0 ? (
+                    <div className="flex flex-wrap gap-1.5">
+                      {item.sourceTitles.map((t, idx) => (
+                        <span
+                          key={idx}
+                          className="px-2 py-0.5 rounded-md bg-stone-100 border border-stone-200 text-stone-700 text-[10px] font-mono font-medium"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="text-[10px] text-red-600 font-mono font-bold">
+                      Zero citations recorded (Ungrounded fallback)
+                    </span>
+                  )}
+                </div>
 
-              {/* Action Buttons */}
-              <div className="pt-2 border-t border-border flex items-center justify-between">
-                <span className="text-[11px] text-muted-foreground font-mono">
-                  Conv ID: {item.conversationId.slice(0, 10)}...
-                </span>
+                {/* Triage Action Buttons */}
                 <div className="flex items-center gap-2">
                   <button
+                    type="button"
                     onClick={() => handleOpenReview(item, "REVIEWED")}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-600/10 text-emerald-600 hover:bg-emerald-600/20 border border-emerald-600/20 transition-colors"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 text-xs font-bold border border-emerald-200 transition-colors shadow-2xs cursor-pointer"
                   >
-                    <Check className="w-3.5 h-3.5" />
-                    Approve (Safe)
+                    <Check className="h-3.5 w-3.5 text-emerald-700" />
+                    <span>Mark Safe</span>
                   </button>
+
                   <button
+                    type="button"
                     onClick={() => handleOpenReview(item, "FLAGGED_UNSAFE")}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-red-600/10 text-red-600 hover:bg-red-600/20 border border-red-600/20 transition-colors"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-900 text-xs font-bold border border-red-200 transition-colors shadow-2xs cursor-pointer"
                   >
-                    <Flag className="w-3.5 h-3.5" />
-                    Flag Hallucination / Unsafe
+                    <Flag className="h-3.5 w-3.5 text-red-700" />
+                    <span>Flag Unsafe</span>
                   </button>
                 </div>
               </div>
@@ -319,96 +336,69 @@ export function AiReviewView({ initialMessages }: AiReviewViewProps) {
         )}
       </div>
 
-      {/* Review Modal */}
+      {/* 5. Review Dialog Modal */}
       {selectedMessage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
-          <div className="bg-card border border-border rounded-xl shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="p-4 border-b border-border flex items-center justify-between bg-muted/30">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-xs animate-in fade-in">
+          <div className="bg-[#FAF9F5] rounded-3xl border border-stone-300 w-full max-w-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-5 border-b border-stone-200 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-primary" />
-                <h3 className="font-semibold text-foreground text-sm">
-                  Record AI Review Decision
+                <ShieldCheck className="h-5 w-5 text-amber-800" />
+                <h3 className="font-serif font-bold text-base text-pankh-clay">
+                  Audit AI Message & Triage
                 </h3>
               </div>
               <button
+                type="button"
                 onClick={() => setSelectedMessage(null)}
-                className="text-muted-foreground hover:text-foreground p-1 rounded-md"
+                className="h-8 w-8 rounded-lg hover:bg-stone-200 flex items-center justify-center text-stone-600 cursor-pointer"
               >
-                <X className="w-4 h-4" />
+                <X className="h-4 w-4" />
               </button>
             </div>
 
             <form onSubmit={handleSaveReview} className="p-5 space-y-4">
               <div className="space-y-1">
-                <label className="text-xs font-medium text-muted-foreground">Decision Verdict</label>
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setReviewStatus("REVIEWED")}
-                    className={cn(
-                      "px-3 py-2 rounded-lg text-xs font-medium border text-center transition-colors",
-                      reviewStatus === "REVIEWED"
-                        ? "bg-emerald-500/10 border-emerald-500 text-emerald-600 font-semibold"
-                        : "border-border text-muted-foreground hover:bg-muted"
-                    )}
-                  >
-                    Verified Safe
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setReviewStatus("FLAGGED_UNSAFE")}
-                    className={cn(
-                      "px-3 py-2 rounded-lg text-xs font-medium border text-center transition-colors",
-                      reviewStatus === "FLAGGED_UNSAFE"
-                        ? "bg-red-500/10 border-red-500 text-red-500 font-semibold"
-                        : "border-border text-muted-foreground hover:bg-muted"
-                    )}
-                  >
-                    Flag Unsafe
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setReviewStatus("DISMISSED")}
-                    className={cn(
-                      "px-3 py-2 rounded-lg text-xs font-medium border text-center transition-colors",
-                      reviewStatus === "DISMISSED"
-                        ? "bg-muted border-foreground/30 text-foreground font-semibold"
-                        : "border-border text-muted-foreground hover:bg-muted"
-                    )}
-                  >
-                    Dismiss
-                  </button>
-                </div>
+                <label className="text-xs font-bold text-stone-700 font-mono uppercase">
+                  Review Determination
+                </label>
+                <select
+                  value={reviewStatus}
+                  onChange={(e) => setReviewStatus(e.target.value as any)}
+                  className="w-full p-2.5 rounded-xl bg-white border border-stone-300 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 font-sans"
+                >
+                  <option value="REVIEWED">REVIEWED — Clinically safe and verified</option>
+                  <option value="FLAGGED_UNSAFE">FLAGGED_UNSAFE — Violates clinical safety / diagnostic claim</option>
+                  <option value="DISMISSED">DISMISSED — Spurious or invalid feedback</option>
+                </select>
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-medium text-muted-foreground">
-                  Reviewer Notes / Action Required (Optional)
+                <label className="text-xs font-bold text-stone-700 font-mono uppercase">
+                  Audit Note & Corrective Action
                 </label>
                 <textarea
                   rows={3}
                   value={reviewNotes}
                   onChange={(e) => setReviewNotes(e.target.value)}
-                  placeholder="e.g. Verified retrieval trace is correct. Farmer question was asking about feed formulation outside guidelines."
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-border bg-background focus:outline-none focus:ring-1 focus:ring-primary"
+                  placeholder="Explain why this response was flagged or approved. If unsafe, note whether knowledge base chunk needs updating..."
+                  className="w-full p-3 rounded-xl bg-white border border-stone-300 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500 font-sans"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-border">
+              <div className="flex items-center justify-end gap-2.5 pt-2">
                 <button
                   type="button"
                   onClick={() => setSelectedMessage(null)}
-                  disabled={isSubmitting}
-                  className="px-3 py-2 text-xs font-medium border border-border rounded-lg text-foreground hover:bg-muted"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:bg-stone-200/70 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2 text-xs font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all shadow-2xs disabled:opacity-50 cursor-pointer"
                 >
-                  {isSubmitting ? "Saving..." : "Save Review Decision"}
+                  {isSubmitting ? "Saving Audit..." : "Submit Determination"}
                 </button>
               </div>
             </form>

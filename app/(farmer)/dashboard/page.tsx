@@ -9,6 +9,14 @@ export default async function FarmerDashboardPage() {
     redirect("/login?callbackUrl=/dashboard");
   }
 
+  const role = session.user.role;
+  if (role === "ADMIN" || role === "SUPER_ADMIN") {
+    redirect("/admin");
+  }
+  if (role === "VET") {
+    redirect("/vet");
+  }
+
   const data = await getFarmerDashboardData();
 
   if (data.needsOnboarding) {

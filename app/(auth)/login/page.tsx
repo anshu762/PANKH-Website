@@ -45,8 +45,16 @@ function LoginForm() {
         setServerError(res.error);
         setIsSubmitting(false);
       } else {
-        router.push(callbackUrl);
-        router.refresh();
+        let destination = callbackUrl;
+        const requestedCallback = searchParams.get("callbackUrl");
+        if (!requestedCallback || requestedCallback === "/dashboard") {
+          if (res?.role === "ADMIN" || res?.role === "SUPER_ADMIN") {
+            destination = "/admin";
+          } else if (res?.role === "VET") {
+            destination = "/vet";
+          }
+        }
+        window.location.href = destination;
       }
     } catch {
       setServerError("An unexpected error occurred. Please try again.");

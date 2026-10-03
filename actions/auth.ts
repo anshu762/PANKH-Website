@@ -15,12 +15,17 @@ export async function authenticate(data: LoginInput) {
   const { email, password } = validated.data;
 
   try {
+    const user = await prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+      select: { role: true },
+    });
+
     await signIn("credentials", {
       email,
       password,
       redirect: false,
     });
-    return { success: true };
+    return { success: true, role: user?.role };
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
