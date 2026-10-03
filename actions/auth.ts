@@ -15,6 +15,13 @@ export async function authenticate(data: LoginInput) {
   const { email, password } = validated.data;
 
   try {
+    if (!process.env.DATABASE_URL) {
+      return {
+        error:
+          "Database not configured: Please set DATABASE_URL in Vercel Project Settings > Environment Variables.",
+      };
+    }
+
     const user = await prisma.user.findUnique({
       where: { email: email.toLowerCase() },
       select: { role: true },
@@ -32,10 +39,11 @@ export async function authenticate(data: LoginInput) {
         case "CredentialsSignin":
           return { error: "Invalid email or password." };
         default:
-          return { error: "Authentication failed. Please try again." };
+          return { error: "Authentication failed. Please verify credentials or AUTH_SECRET in Vercel." };
       }
     }
-    throw error;
+    console.error("Authenticate error:", error);
+    return { error: (error as any)?.message || "Authentication failed. Please try again." };
   }
 }
 
@@ -60,34 +68,57 @@ export async function registerUser(data: RegisterInput) {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
-    await prisma.$transaction(async (tx) => {
-      const newUser = await tx.user.create({
-        data: {
-          email: email.toLowerCase(),
-          passwordHash,
-          name,
-          role,
-          phone: phone || null,
-          preferredLanguage,
-        },
-      });
-
-      // If user registered as a farmer, initialize the Farmer record
-      if (role === "FARMER") {
-        await tx.farmer.create({
-          data: {
-            userId: newUser.id,
-            village: village || "Village",
-            district: district || "District",
-            state: state || "Punjab",
-          },
-        });
-      }
+    await prisma.user.create({
+      data: {
+        email: email.toLowerCase(),
+        passwordHash,
+        name,
+        role,
+        phone: phone || null,
+        preferredLanguage,
+        ...(role === "FARMER"
+          ? {
+              farmer: {
+                create: {
+                  village: village || "Village",
+                  district: district || "District",
+                  state: state || "Punjab",
+                },
+              },
+            }
+          : {}),
+      },
     });
 
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Failed to register user:", error);
-    return { error: "Failed to create account. Please try again later." };
+
+    if (!process.env.DATABASE_URL) {
+      return {
+        error:
+          "Database not configured: Please set DATABASE_URL in Vercel Project Settings > Environment Variables.",
+      };
+    }
+    if (
+      error?.code === "P1001" ||
+      error?.message?.includes("Can't reach database server")
+    ) {
+      return {
+        error:
+          "Cannot reach database server. Please verify DATABASE_URL in Vercel Environment Variables.",
+      };
+    }
+    if (error?.code === "P2021" || error?.message?.includes("does not exist")) {
+      return {
+        error:
+          "Database tables not found. Please ensure database schema is deployed (prisma db push).",
+      };
+    }
+    if (error?.code === "P2002") {
+      return { error: "An account with this email already exists." };
+    }
+
+    return { error: error?.message || "Failed to create account. Please try again later." };
   }
 }
