@@ -29,18 +29,30 @@ export const metadata: Metadata = {
     "Early disease alerts, Punjabi-first AI advice, direct vet escalation, and automated flock cost tracking for broiler and layer farms in Punjab.",
 };
 
+import { cookies } from "next/headers";
+import { LANGUAGE_COOKIE_NAME, DEFAULT_LANGUAGE } from "@/lib/i18n/config";
+import { isValidLanguage } from "@/lib/i18n";
+import { SupportedLanguage } from "@/lib/i18n/types";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = cookies();
+  const savedLang = cookieStore.get(LANGUAGE_COOKIE_NAME)?.value;
+  const initialLang: SupportedLanguage =
+    savedLang && isValidLanguage(savedLang)
+      ? (savedLang as SupportedLanguage)
+      : DEFAULT_LANGUAGE;
+
   return (
     <html
-      lang="pa"
+      lang={initialLang}
       className={`${fraunces.variable} ${manrope.variable} ${notoSansGurmukhi.variable}`}
     >
       <body className="font-sans antialiased bg-background text-foreground min-h-screen">
-        <LanguageProvider>
+        <LanguageProvider initialLanguage={initialLang}>
           {children}
           <PwaRegister />
         </LanguageProvider>
