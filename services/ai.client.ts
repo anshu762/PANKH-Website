@@ -56,7 +56,7 @@ class AiServiceClient {
    */
   async synthesizeSpeech(
     text: string
-  ): Promise<{ audioBlob?: Blob; fallbackToBrowser?: boolean }> {
+  ): Promise<{ audioBlob?: Blob; fallbackToBrowser?: boolean; suggestedLang?: string }> {
     const res = await fetch("/api/ai/tts", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -74,7 +74,10 @@ class AiServiceClient {
     }
 
     const data = await res.json();
-    return { fallbackToBrowser: !!data.fallbackToBrowser };
+    return {
+      fallbackToBrowser: !!data.fallbackToBrowser,
+      suggestedLang: data.suggestedLang,
+    };
   }
 
   /**

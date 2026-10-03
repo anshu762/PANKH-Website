@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { put } from "@vercel/blob";
+import { uploadImageToCloudinary } from "@/lib/cloudinary";
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,24 +18,25 @@ export async function POST(req: NextRequest) {
 
     let photoUrl = "";
 
-    // 1. Upload to Vercel Blob if token is configured
-    if (process.env.BLOB_READ_WRITE_TOKEN && !process.env.BLOB_READ_WRITE_TOKEN.includes("xxxx")) {
-      try {
-        const blob = await put(`poultry-photos/${Date.now()}-${photoFile.name}`, photoFile, {
-          access: "public",
-        });
-        photoUrl = blob.url;
-      } catch (err) {
-        console.warn("Vercel Blob upload failed, falling back to base64 preview:", err);
-      }
-    }
-
-    // Convert file to Base64 for vision LLM analysis
+    // Convert file to buffer and Base64 for vision analysis & Cloudinary upload
     const arrayBuffer = await photoFile.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     const mimeType = photoFile.type || "image/jpeg";
     const base64Data = buffer.toString("base64");
     const dataUrl = `data:${mimeType};base64,${base64Data}`;
+
+    // 1. Upload to Cloudinary if configured
+    try {
+      const uploadResult = await uploadImageToCloudinary(buffer, {
+        folder: "pankh/poultry-photos",
+        filename: photoFile.name,
+      });
+      if (uploadResult?.secureUrl) {
+        photoUrl = uploadResult.secureUrl;
+      }
+    } catch (err) {
+      console.warn("Cloudinary upload failed, falling back to data URL:", err);
+    }
 
     if (!photoUrl) {
       photoUrl = dataUrl;

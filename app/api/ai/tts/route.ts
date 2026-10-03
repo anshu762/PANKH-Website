@@ -15,6 +15,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Text is required for speech synthesis" }, { status: 400 });
     }
 
+    // Determine optimal voice target
+    const isGurmukhi = /[\u0A00-\u0A7F]/.test(text);
+    const isHindi = /[\u0900-\u097F]/.test(text);
+    const targetLang = isGurmukhi ? "pa-IN" : isHindi ? "hi-IN" : "en-IN";
+    const voiceName = isGurmukhi ? "pa-IN-Wavenet-A" : isHindi ? "hi-IN-Neural2-A" : "en-IN-Neural2-A";
+
     const apiKey = process.env.GOOGLE_CLOUD_API_KEY;
 
     // 1. If Google Cloud API Key is configured, execute real TTS request
@@ -30,12 +36,13 @@ export async function POST(req: NextRequest) {
             body: JSON.stringify({
               input: { text: text.slice(0, 1000) },
               voice: {
-                languageCode: "pa-IN",
-                name: "pa-IN-Wavenet-A",
+                languageCode: targetLang,
+                name: voiceName,
               },
               audioConfig: {
                 audioEncoding: "MP3",
-                speakingRate: 0.95,
+                speakingRate: 1.0,
+                pitch: 0.0,
               },
             }),
           }
@@ -60,11 +67,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 2. Return signal to use browser speech synthesis API if external key is unconfigured
+    // 2. Return signal to use browser speech synthesis API with detected optimal language
     return NextResponse.json({
       fallbackToBrowser: true,
       textToSpeak: text,
-      suggestedLang: "pa-IN",
+      suggestedLang: targetLang,
     });
   } catch (error: any) {
     console.error("TTS Route Error:", error);

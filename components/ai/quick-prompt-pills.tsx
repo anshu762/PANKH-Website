@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useLanguage } from "@/hooks/use-language";
+import { Wheat, SunMedium, Syringe, AlertTriangle } from "lucide-react";
 
 interface QuickPromptPillsProps {
   onSelectPrompt: (promptText: string) => void;
@@ -17,40 +18,52 @@ export function QuickPromptPills({
 
   const quickPrompts = [
     {
-      label: dict.quickPromptFeed,
-      text: "Day 15 broiler starter feed intake and standard FCR chart",
+      icon: Wheat,
+      label: dict.quickPromptFeed || "15-Day Feed & FCR",
+      text: "Day 15 broiler starter feed intake, crude protein percentage and standard FCR chart",
+      color: "hover:border-amber-400 hover:bg-amber-50 text-amber-900",
     },
     {
-      label: dict.quickPromptHeat,
-      text: "May-June garmi me shed foggers aur roof sprinklers ka schedule",
+      icon: SunMedium,
+      label: dict.quickPromptHeat || "Heat Stress & Foggers",
+      text: "May-June garmi me shed foggers aur roof sprinklers ka schedule aur electrolytes",
+      color: "hover:border-orange-400 hover:bg-orange-50 text-orange-900",
     },
     {
-      label: dict.quickPromptVaccine,
+      icon: Syringe,
+      label: dict.quickPromptVaccine || "IBD & LaSota Vaccine",
       text: "Gumboro (IBD) aur LaSota vaccination schedule and skim milk stabilizer",
+      color: "hover:border-blue-400 hover:bg-blue-50 text-blue-900",
     },
     {
-      label: dict.quickPromptRedFlag,
+      icon: AlertTriangle,
+      label: dict.quickPromptRedFlag || "🚨 Red Flag Emergency",
       text: "Chicks ki gardan mudi hui hai, gasping kar rahe hain aur subah se 30 mar gaye",
+      color: "hover:border-rose-400 hover:bg-rose-50 text-rose-900",
     },
   ];
 
   return (
-    <div className="pt-3">
-      <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider block mb-1.5">
-        {dict.quickPromptsLabel}
-      </span>
-      <div className="flex flex-wrap gap-1.5">
-        {quickPrompts.map((qp, idx) => (
-          <button
-            key={idx}
-            type="button"
-            onClick={() => onSelectPrompt(qp.text)}
-            disabled={disabled}
-            className="text-left text-[11px] px-2.5 py-1 rounded-lg bg-stone-50 hover:bg-amber-50/80 border border-stone-200 hover:border-amber-300 text-stone-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {qp.label}
-          </button>
-        ))}
+    <div className="pt-2">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar scroll-smooth">
+        <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider shrink-0 mr-1">
+          Quick test:
+        </span>
+        {quickPrompts.map((qp, idx) => {
+          const Icon = qp.icon;
+          return (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => onSelectPrompt(qp.text)}
+              disabled={disabled}
+              className={`shrink-0 text-left text-xs px-2.5 py-1.5 rounded-xl bg-white border border-stone-200 shadow-2xs font-medium transition-all flex items-center gap-1.5 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${qp.color}`}
+            >
+              <Icon className="h-3.5 w-3.5 shrink-0 opacity-80" />
+              <span>{qp.label}</span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

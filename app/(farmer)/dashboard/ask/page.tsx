@@ -24,12 +24,13 @@ export default async function AskPankhPage() {
   }
 
   return (
-    <div className="w-full py-2">
+    <div className="w-full">
       <ChatContainer
         initialConversationId={initialData.recentConversationId}
         initialMessages={initialData.initialMessages}
         activeBatchId={initialData.activeBatch?.id || null}
         birdType={initialData.activeBatch?.birdType || null}
+        farmerName={initialData.farmer.name}
       />
     </div>
   );

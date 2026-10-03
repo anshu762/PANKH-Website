@@ -33,6 +33,7 @@ export class AiOrchestrationService {
     const farmer = await prisma.farmer.findUnique({
       where: { userId },
       include: {
+        user: true,
         farms: {
           include: {
             batches: {
@@ -77,6 +78,7 @@ export class AiOrchestrationService {
       redFlags,
       retrievedChunks,
       birdType: activeBatch?.birdType,
+      farmerName: farmer.user?.name || undefined,
     });
 
     // 6. Escalation: Create Alert (RED) and CaseRecord if red-flag triggered

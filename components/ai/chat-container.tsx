@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { AlertTriangle } from "lucide-react";
+import React, { useEffect, useRef } from "react";
+import { AlertTriangle, RotateCcw } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
 import { ChatMessage, AnswerPayload } from "@/types/ai";
 import { useAiChat } from "@/hooks/use-ai-chat";
+import { aiServiceClient } from "@/services/ai.client";
 import { ChatHeader } from "./chat-header";
 import { QuickPromptPills } from "./quick-prompt-pills";
 import { ChatEmptyState } from "./chat-empty-state";
@@ -12,8 +13,6 @@ import { ChatUserMessage } from "./chat-user-message";
 import { ChatThinkingIndicator } from "./chat-thinking-indicator";
 import { ChatInputBar } from "./chat-input-bar";
 import { AiAnswerCard } from "./ai-answer-card";
-import { VoiceRecorderTab } from "./voice-recorder-tab";
-import { PhotoAnalysisTab } from "./photo-analysis-tab";
 
 export type { ChatMessage };
 
@@ -22,6 +21,7 @@ interface ChatContainerProps {
   initialMessages?: ChatMessage[];
   activeBatchId?: string | null;
   birdType?: string | null;
+  farmerName?: string;
 }
 
 export function ChatContainer({
@@ -29,10 +29,10 @@ export function ChatContainer({
   initialMessages = [],
   activeBatchId,
   birdType,
+  farmerName,
 }: ChatContainerProps) {
   const { t } = useLanguage();
   const dict = t.aiAssistant;
-  const [activeTab, setActiveTab] = useState<"TEXT" | "VOICE" | "PHOTO">("TEXT");
 
   const {
     messages,
@@ -41,6 +41,7 @@ export function ChatContainer({
     draftInput,
     updateDraft,
     sendMessage,
+    clearChat,
   } = useAiChat({
     initialConversationId,
     initialMessages,
@@ -57,28 +58,60 @@ export function ChatContainer({
     scrollToBottom();
   }, [messages, isLoading]);
 
+  // Unified send handler supporting text, voice dictation, and attached photos
+  const handleSend = async (text: string, photoFile?: File) => {
+    if (photoFile) {
+      try {
+        const res = await aiServiceClient.analyzePhoto(photoFile);
+        const obs =
+          res.observations && res.observations.length > 0
+            ? res.observations.join("; ")
+            : "Visible physical poultry features captured";
+        const followUps =
+          res.followUpQuestions && res.followUpQuestions.length > 0
+            ? res.followUpQuestions.join("; ")
+            : "";
+
+        const composedMessage = text.trim()
+          ? `${text.trim()}\n\n[Photo Attached - Visible Observation]:\n• Features: ${obs}${
+              followUps ? `\n• Key Checkpoints: ${followUps}` : ""
+            }`
+          : `[Photo Attached - Visible Observation]:\n• Features: ${obs}${
+              followUps ? `\n• Key Checkpoints: ${followUps}` : ""
+            }\n\nPlease provide guidance based on verified poultry protocols.`;
+
+        sendMessage(composedMessage, "PHOTO");
+      } catch (err) {
+        console.warn("Photo analysis fallback:", err);
+        sendMessage(
+          text.trim() || "[Photo Attached]: Please check my poultry flock symptoms.",
+          "PHOTO"
+        );
+      }
+    } else {
+      sendMessage(text, "TEXT");
+    }
+  };
+
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)] min-h-[550px] max-w-4xl mx-auto">
-      {/* 1. Header & Quick Prompts */}
-      <div className="bg-white rounded-2xl border border-stone-200/90 p-4 sm:p-5 shadow-xs mb-4">
+    <div className="w-full max-w-5xl xl:max-w-6xl mx-auto flex flex-col h-[calc(100dvh-110px)] min-h-[640px] bg-white rounded-3xl border border-stone-200/90 shadow-sm overflow-hidden">
+      {/* 1. Header (Clean Bot Identity + Active Batch + New Chat) */}
+      <div className="px-4 py-3 sm:px-6 sm:py-3.5 bg-white shrink-0">
         <ChatHeader
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
+          onClearChat={clearChat}
+          hasMessages={messages.length > 0}
           birdType={birdType}
         />
-
-        {activeTab === "TEXT" && (
-          <QuickPromptPills
-            onSelectPrompt={(prompt) => sendMessage(prompt, "TEXT")}
-            disabled={isLoading}
-          />
-        )}
       </div>
 
-      {/* 2. Messages Stream */}
-      <div className="flex-1 overflow-y-auto space-y-4 p-2 sm:p-3 scroll-smooth">
+      {/* 2. Spacious Message Feed */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 space-y-5 scroll-smooth">
         {messages.length === 0 ? (
-          <ChatEmptyState />
+          <ChatEmptyState
+            onSelectPrompt={(prompt) => handleSend(prompt)}
+            disabled={isLoading}
+            farmerName={farmerName}
+          />
         ) : (
           messages.map((msg) => {
             if (msg.role === "USER") {
@@ -106,11 +139,14 @@ export function ChatContainer({
             }
 
             return (
-              <div key={msg.id} className="flex justify-start gap-2.5 items-start">
-                <div className="h-8 w-8 rounded-full bg-amber-500/20 border border-amber-400 text-amber-800 flex items-center justify-center shrink-0 font-serif font-bold text-sm shadow-xs">
+              <div
+                key={msg.id}
+                className="flex justify-start gap-3 items-start animate-in fade-in duration-200"
+              >
+                <div className="h-9 w-9 rounded-2xl bg-amber-500/20 border border-amber-400 text-amber-800 flex items-center justify-center shrink-0 font-serif font-bold text-sm shadow-2xs mt-1">
                   ਪੰ
                 </div>
-                <div className="flex-1 max-w-2xl">
+                <div className="flex-1 max-w-4xl">
                   <AiAnswerCard
                     messageId={msg.id}
                     answer={parsedAnswer}
@@ -118,7 +154,7 @@ export function ChatContainer({
                     caseId={msg.caseId}
                     alertId={msg.alertId}
                     initialFeedback={msg.feedback}
-                    onAskFollowUp={(q) => sendMessage(q, "TEXT")}
+                    onAskFollowUp={(prompt) => handleSend(prompt)}
                   />
                 </div>
               </div>
@@ -131,47 +167,47 @@ export function ChatContainer({
         )}
 
         {error && (
-          <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 shrink-0" />
-            <span>{error}</span>
+          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm flex items-center justify-between gap-3 shadow-xs">
+            <div className="flex items-center gap-2.5">
+              <AlertTriangle className="h-4 w-4 shrink-0 text-rose-600" />
+              <span>{error}</span>
+            </div>
+            {draftInput && (
+              <button
+                type="button"
+                onClick={() => handleSend(draftInput)}
+                className="px-3 py-1.5 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-700 transition-colors flex items-center gap-1.5 shrink-0 text-xs cursor-pointer shadow-2xs"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                <span>Retry</span>
+              </button>
+            )}
           </div>
         )}
 
         <div ref={messagesEndRef} />
       </div>
 
-      {/* 3. Input Modes */}
-      <div className="pt-3">
-        {activeTab === "TEXT" && (
-          <ChatInputBar
-            value={draftInput}
-            onChange={updateDraft}
-            onSend={(text) => sendMessage(text, "TEXT")}
-            disabled={isLoading}
-            placeholder={dict.inputPlaceholder}
-            sendLabel={dict.sendButton}
-          />
+      {/* 3. Bottom Seamless Area (NO dividing line border-t, seamless ChatGPT experience) */}
+      <div className="px-3 py-3 sm:px-6 sm:py-4 bg-white shrink-0 space-y-2.5">
+        {/* Quick follow-up pills when chat is ongoing */}
+        {messages.length > 0 && (
+          <div className="max-w-4xl mx-auto">
+            <QuickPromptPills
+              onSelectPrompt={(prompt) => handleSend(prompt)}
+              disabled={isLoading}
+            />
+          </div>
         )}
 
-        {activeTab === "VOICE" && (
-          <VoiceRecorderTab
-            onSendTranscript={(transcript) => {
-              sendMessage(transcript, "VOICE");
-              setActiveTab("TEXT");
-            }}
-            isLoading={isLoading}
-          />
-        )}
-
-        {activeTab === "PHOTO" && (
-          <PhotoAnalysisTab
-            onSendPhotoQuery={(query) => {
-              sendMessage(query, "PHOTO");
-              setActiveTab("TEXT");
-            }}
-            isLoading={isLoading}
-          />
-        )}
+        {/* ChatGPT-style Modern Inline Input Bar */}
+        <ChatInputBar
+          value={draftInput}
+          onChange={updateDraft}
+          onSend={handleSend}
+          disabled={isLoading}
+          placeholder={dict.inputPlaceholder}
+        />
       </div>
     </div>
   );

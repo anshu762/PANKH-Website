@@ -8,9 +8,10 @@ import { aiServiceClient } from "@/services/ai.client";
 interface PhotoAnalysisTabProps {
   onSendPhotoQuery: (query: string, photoUrl?: string) => void;
   isLoading: boolean;
+  onCancel?: () => void;
 }
 
-export function PhotoAnalysisTab({ onSendPhotoQuery, isLoading }: PhotoAnalysisTabProps) {
+export function PhotoAnalysisTab({ onSendPhotoQuery, isLoading, onCancel }: PhotoAnalysisTabProps) {
   const { t } = useLanguage();
   const dict = t.aiAssistant;
 
@@ -71,15 +72,26 @@ export function PhotoAnalysisTab({ onSendPhotoQuery, isLoading }: PhotoAnalysisT
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-6">
+    <div className="bg-white rounded-2xl border border-stone-200 p-4 sm:p-5 space-y-4">
       {/* Header Info */}
-      <div className="text-center max-w-md mx-auto space-y-1.5">
-        <h3 className="font-serif text-lg font-bold text-pankh-clay">
-          {dict.tabPhoto}
-        </h3>
-        <p className="text-xs text-stone-600 leading-relaxed">
-          {dict.photoUploadSubtitle}
-        </p>
+      <div className="flex items-center justify-between pb-2 border-b border-stone-100">
+        <div>
+          <h3 className="font-serif text-base font-bold text-pankh-clay">
+            {dict.tabPhoto}
+          </h3>
+          <p className="text-[11px] text-stone-500 leading-relaxed">
+            {dict.photoUploadSubtitle}
+          </p>
+        </div>
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-2.5 py-1 text-xs text-stone-600 hover:text-stone-900 rounded-lg bg-stone-100 hover:bg-stone-200 transition-colors font-medium cursor-pointer"
+          >
+            ← Back to Text
+          </button>
+        )}
       </div>
 
       {error && (

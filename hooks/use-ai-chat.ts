@@ -69,6 +69,10 @@ export function useAiChat({
       };
 
       setIsLoading(true);
+      // Immediately display user message in the chat stream
+      setMessages((prev) => [...prev, userMessage]);
+      // Immediately clear the input draft so input box empties
+      clearDraft();
 
       try {
         const data: ChatApiResponse = await aiServiceClient.sendChatMessage({
@@ -77,8 +81,6 @@ export function useAiChat({
           inputMode: mode,
           batchId: activeBatchId || undefined,
         });
-
-        clearDraft();
 
         if (data.conversationId) {
           setConversationId(data.conversationId);
@@ -106,8 +108,15 @@ export function useAiChat({
         setIsLoading(false);
       }
     },
-    [isLoading, conversationId, activeBatchId, clearDraft]
+    [isLoading, conversationId, activeBatchId, clearDraft, updateDraft]
   );
+
+  const clearChat = useCallback(() => {
+    setMessages([]);
+    setConversationId(null);
+    clearDraft();
+    setError(null);
+  }, [clearDraft]);
 
   return {
     messages,
@@ -117,6 +126,7 @@ export function useAiChat({
     draftInput,
     updateDraft,
     sendMessage,
+    clearChat,
     setError,
   };
 }
