@@ -43,24 +43,24 @@ export function ConsentModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-stone-950/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div
-        className="w-full max-w-lg bg-white dark:bg-stone-900 rounded-2xl shadow-2xl border border-stone-200 dark:border-stone-800 overflow-hidden"
+        className="w-full max-w-lg bg-[#FAF9F5] rounded-3xl shadow-2xl border border-stone-200/90 overflow-hidden animate-in zoom-in-95 duration-150"
         role="dialog"
         aria-modal="true"
         aria-labelledby="consent-title"
       >
-        {/* Header with Vermilion / Shield Accent */}
-        <div className="bg-gradient-to-r from-orange-600 to-amber-600 p-5 text-white flex items-start justify-between">
+        {/* Header with Pankh Shield Theme */}
+        <div className="bg-white px-5 sm:px-6 py-4 sm:py-5 border-b border-stone-200/80 flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-              <ShieldCheck className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center shrink-0 shadow-2xs">
+              <ShieldCheck className="w-5 h-5 text-emerald-700" />
             </div>
             <div>
-              <h2 id="consent-title" className="text-lg font-bold">
+              <h2 id="consent-title" className="text-base sm:text-lg font-serif font-bold text-pankh-clay tracking-tight">
                 {t.consentModalTitle}
               </h2>
-              <p className="text-xs text-orange-100 mt-0.5">
+              <p className="text-xs text-stone-500 mt-0.5">
                 Pankh Section 11 Farmer Data Protection
               </p>
             </div>
@@ -68,68 +68,69 @@ export function ConsentModal({
           <button
             onClick={onClose}
             disabled={submitting}
-            className="text-white/80 hover:text-white rounded-lg p-1 hover:bg-white/10 transition-colors"
+            className="text-stone-400 hover:text-stone-700 rounded-xl p-1.5 hover:bg-stone-100 transition-colors cursor-pointer"
+            aria-label="Close dialog"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-4">
-          <div className="bg-orange-50 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-800/80 rounded-xl p-3.5 text-xs text-orange-900 dark:text-orange-200 leading-relaxed flex items-start gap-2.5">
+        <div className="p-5 sm:p-6 space-y-4 max-h-[80vh] overflow-y-auto no-scrollbar">
+          <div className="bg-orange-50/80 border border-orange-200/90 rounded-2xl p-3.5 text-xs text-orange-950 leading-relaxed flex items-start gap-2.5 shadow-2xs">
             <AlertCircle className="w-4 h-4 text-orange-600 shrink-0 mt-0.5" />
             <span>{t.consentModalDesc}</span>
           </div>
 
           {/* Specialist Summary */}
-          <div className="bg-stone-50 dark:bg-stone-800/50 p-3.5 rounded-xl border border-stone-200 dark:border-stone-800">
-            <span className="text-[11px] font-semibold text-stone-700 dark:text-stone-300 uppercase tracking-wider">
+          <div className="bg-white p-4 rounded-2xl border border-stone-200/90 shadow-2xs">
+            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider font-mono">
               Recipient Specialist
             </span>
-            <div className="mt-1 flex items-baseline justify-between">
-              <h4 className="font-bold text-stone-900 dark:text-stone-100 text-sm">
+            <div className="mt-1 flex items-baseline justify-between gap-2">
+              <h4 className="font-bold text-stone-900 text-sm">
                 {selectedVet.name}
               </h4>
-              <span className="text-xs font-semibold text-orange-600">
+              <span className="text-xs font-semibold text-orange-600 shrink-0">
                 {selectedVet.distanceKm} km away
               </span>
             </div>
-            <p className="text-xs text-stone-700 dark:text-stone-300 mt-0.5">
+            <p className="text-xs text-stone-600 mt-0.5">
               {selectedVet.qualification || selectedVet.address}
             </p>
           </div>
 
           {/* Shared Data Disclosure */}
           <div>
-            <h5 className="text-xs font-bold text-stone-900 dark:text-stone-100 uppercase tracking-wider mb-2">
+            <h5 className="text-[10px] font-bold text-stone-400 uppercase tracking-wider font-mono mb-2">
               {t.consentSummaryDataPoints}
             </h5>
-            <ul className="space-y-2 text-xs text-stone-700 dark:text-stone-300">
+            <ul className="space-y-2 text-xs text-stone-700">
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                 <span>
-                  <strong className="text-stone-900 dark:text-stone-100">{t.consentPhonePoint}</strong>
+                  <strong className="text-stone-900">{t.consentPhonePoint}</strong>
                   {farmerLocation ? ` (${farmerLocation})` : ""}
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                 <span>
-                  <strong className="text-stone-900 dark:text-stone-100">{t.consentFlockPoint}</strong>
+                  <strong className="text-stone-900">{t.consentFlockPoint}</strong>
                   {batchName ? ` [Batch: ${batchName}]` : ""}
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                 <span>
-                  <strong className="text-stone-900 dark:text-stone-100">{t.consentTrendsPoint}</strong>
+                  <strong className="text-stone-900">{t.consentTrendsPoint}</strong>
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                 <span>
                   Non-diagnosis disclaimer label:{" "}
-                  <em className="text-stone-700 dark:text-stone-300 font-serif">"{t.disclaimerLabel}"</em>
+                  <em className="text-stone-600 font-serif">"{t.disclaimerLabel}"</em>
                 </span>
               </li>
             </ul>
@@ -137,17 +138,17 @@ export function ConsentModal({
 
           {/* Channel Selector */}
           <div className="pt-2">
-            <span className="text-xs font-bold text-stone-700 dark:text-stone-300 block mb-1.5">
+            <span className="text-xs font-bold text-stone-700 block mb-1.5">
               Transmission Channel
             </span>
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setChannel("WHATSAPP")}
-                className={`py-2 px-3 rounded-lg border text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
+                className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
                   channel === "WHATSAPP"
-                    ? "border-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-bold"
-                    : "border-stone-200 dark:border-stone-800 text-stone-600 hover:bg-stone-50 dark:hover:bg-stone-800"
+                    ? "border-emerald-600 bg-emerald-50 text-emerald-900 font-bold shadow-2xs ring-1 ring-emerald-500"
+                    : "border-stone-200 bg-white text-stone-600 hover:bg-stone-50"
                 }`}
               >
                 <span>WhatsApp (Recommended)</span>
@@ -155,10 +156,10 @@ export function ConsentModal({
               <button
                 type="button"
                 onClick={() => setChannel("SMS")}
-                className={`py-2 px-3 rounded-lg border text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
+                className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
                   channel === "SMS"
-                    ? "border-orange-600 bg-orange-50 dark:bg-orange-950/40 text-orange-800 dark:text-orange-300 font-bold"
-                    : "border-stone-200 dark:border-stone-800 text-stone-600 hover:bg-stone-50 dark:hover:bg-stone-800"
+                    ? "border-orange-600 bg-orange-50 text-orange-900 font-bold shadow-2xs ring-1 ring-orange-500"
+                    : "border-stone-200 bg-white text-stone-600 hover:bg-stone-50"
                 }`}
               >
                 <span>SMS</span>
@@ -168,13 +169,13 @@ export function ConsentModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="bg-stone-50 dark:bg-stone-800/80 px-6 py-4 flex flex-col sm:flex-row gap-2.5 sm:justify-end border-t border-stone-200 dark:border-stone-800">
+        <div className="bg-white px-5 sm:px-6 py-4 flex flex-col sm:flex-row gap-2.5 sm:justify-end border-t border-stone-200/80">
           <Button
             type="button"
             variant="outline"
             onClick={onClose}
             disabled={submitting}
-            className="min-h-[44px]"
+            className="min-h-[42px] rounded-xl text-stone-600 hover:bg-stone-100"
           >
             {t.consentCancelBtn}
           </Button>
@@ -182,7 +183,7 @@ export function ConsentModal({
             type="button"
             onClick={handleAuthorize}
             disabled={submitting}
-            className="min-h-[44px] bg-orange-600 hover:bg-orange-700 text-white font-bold flex items-center gap-2"
+            className="min-h-[42px] rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold flex items-center gap-2 shadow-xs"
           >
             {submitting ? (
               <>

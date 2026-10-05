@@ -62,14 +62,14 @@ export function VetList({ vets, onShareCase, canShare = true }: VetListProps) {
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+        <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 no-scrollbar">
           <button
             type="button"
             onClick={() => setSelectedType("ALL")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors min-h-[38px] ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors min-h-[38px] whitespace-nowrap cursor-pointer ${
               selectedType === "ALL"
-                ? "bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 font-bold"
-                : "bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-300 hover:bg-stone-200"
+                ? "bg-stone-900 text-white font-bold shadow-2xs"
+                : "bg-stone-100 text-stone-700 hover:bg-stone-200"
             }`}
           >
             {t.filterAll}
@@ -77,10 +77,10 @@ export function VetList({ vets, onShareCase, canShare = true }: VetListProps) {
           <button
             type="button"
             onClick={() => setSelectedType(VetLabType.VET)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 min-h-[38px] ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1 min-h-[38px] whitespace-nowrap cursor-pointer ${
               selectedType === VetLabType.VET
-                ? "bg-blue-600 text-white font-bold"
-                : "bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-300 hover:bg-stone-200"
+                ? "bg-blue-600 text-white font-bold shadow-2xs"
+                : "bg-stone-100 text-stone-700 hover:bg-stone-200"
             }`}
           >
             <Stethoscope className="w-3.5 h-3.5" />
@@ -89,10 +89,10 @@ export function VetList({ vets, onShareCase, canShare = true }: VetListProps) {
           <button
             type="button"
             onClick={() => setSelectedType(VetLabType.LAB)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 min-h-[38px] ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1 min-h-[38px] whitespace-nowrap cursor-pointer ${
               selectedType === VetLabType.LAB
-                ? "bg-purple-600 text-white font-bold"
-                : "bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-300 hover:bg-stone-200"
+                ? "bg-purple-600 text-white font-bold shadow-2xs"
+                : "bg-stone-100 text-stone-700 hover:bg-stone-200"
             }`}
           >
             <FlaskConical className="w-3.5 h-3.5" />
@@ -101,10 +101,10 @@ export function VetList({ vets, onShareCase, canShare = true }: VetListProps) {
           <button
             type="button"
             onClick={() => setSelectedType(VetLabType.ASSOCIATION)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 min-h-[38px] ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1 min-h-[38px] whitespace-nowrap cursor-pointer ${
               selectedType === VetLabType.ASSOCIATION
-                ? "bg-amber-600 text-white font-bold"
-                : "bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-300 hover:bg-stone-200"
+                ? "bg-amber-600 text-white font-bold shadow-2xs"
+                : "bg-stone-100 text-stone-700 hover:bg-stone-200"
             }`}
           >
             <Users className="w-3.5 h-3.5" />
@@ -115,10 +115,10 @@ export function VetList({ vets, onShareCase, canShare = true }: VetListProps) {
           <button
             type="button"
             onClick={() => setTeleconsultOnly(!teleconsultOnly)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold border flex items-center gap-1.5 transition-colors min-h-[38px] ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold border flex items-center gap-1.5 transition-colors min-h-[38px] whitespace-nowrap cursor-pointer ${
               teleconsultOnly
-                ? "bg-orange-50 border-orange-300 text-orange-700 dark:bg-orange-950/60 dark:border-orange-800 dark:text-orange-300 font-bold"
-                : "border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:bg-stone-50"
+                ? "bg-orange-50 border-orange-300 text-orange-800 font-bold shadow-2xs"
+                : "border-stone-200 bg-white text-stone-600 hover:bg-stone-50"
             }`}
           >
             <Video className="w-3.5 h-3.5" />
