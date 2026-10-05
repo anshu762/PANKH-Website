@@ -94,7 +94,7 @@ export function ChatContainer({
   };
 
   return (
-    <div className="w-full max-w-5xl xl:max-w-6xl mx-auto flex flex-col h-[calc(100dvh-110px)] min-h-[640px] bg-white rounded-3xl border border-stone-200/90 shadow-sm overflow-hidden">
+    <div className="w-full max-w-5xl xl:max-w-6xl mx-auto flex flex-col h-[calc(100dvh-7.5rem)] md:h-[calc(100dvh-130px)] min-h-0 md:min-h-[580px] bg-white rounded-3xl border border-stone-200/90 shadow-sm overflow-hidden overflow-x-hidden">
       {/* 1. Header (Clean Bot Identity + Active Batch + New Chat) */}
       <div className="px-4 py-3 sm:px-6 sm:py-3.5 bg-white shrink-0">
         <ChatHeader
@@ -105,7 +105,7 @@ export function ChatContainer({
       </div>
 
       {/* 2. Spacious Message Feed */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 space-y-5 scroll-smooth">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 py-4 sm:px-6 sm:py-6 space-y-5 scroll-smooth custom-scrollbar">
         {messages.length === 0 ? (
           <ChatEmptyState
             onSelectPrompt={(prompt) => handleSend(prompt)}
@@ -188,8 +188,8 @@ export function ChatContainer({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* 3. Bottom Seamless Area (NO dividing line border-t, seamless ChatGPT experience) */}
-      <div className="px-3 py-3 sm:px-6 sm:py-4 bg-white shrink-0 space-y-2.5">
+      {/* 3. Bottom Seamless Area */}
+      <div className="px-3 py-3 sm:px-6 sm:py-4 bg-white shrink-0 space-y-2.5 overflow-x-hidden">
         {/* Quick follow-up pills when chat is ongoing */}
         {messages.length > 0 && (
           <div className="max-w-4xl mx-auto">

@@ -44,9 +44,12 @@ export function QuickPromptPills({
   ];
 
   return (
-    <div className="pt-2">
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar scroll-smooth">
-        <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider shrink-0 mr-1">
+    <div className="pt-2 relative">
+      <div
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar scroll-smooth"
+      >
+        <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider shrink-0 mr-1 select-none font-mono">
           Quick test:
         </span>
         {quickPrompts.map((qp, idx) => {
@@ -57,10 +60,10 @@ export function QuickPromptPills({
               type="button"
               onClick={() => onSelectPrompt(qp.text)}
               disabled={disabled}
-              className={`shrink-0 text-left text-xs px-2.5 py-1.5 rounded-xl bg-white border border-stone-200 shadow-2xs font-medium transition-all flex items-center gap-1.5 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${qp.color}`}
+              className={`shrink-0 text-left text-xs px-2.5 py-1.5 rounded-xl bg-white border border-stone-200 shadow-2xs font-semibold transition-all flex items-center gap-1.5 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${qp.color}`}
             >
               <Icon className="h-3.5 w-3.5 shrink-0 opacity-80" />
-              <span>{qp.label}</span>
+              <span className="whitespace-nowrap">{qp.label}</span>
             </button>
           );
         })}
