@@ -216,7 +216,12 @@ export function EconomicsSummaryCards({
                 <input
                   type="number"
                   value={tempAssumedVal}
-                  onChange={(e) => setTempAssumedVal(Number(e.target.value))}
+                  onFocus={(e) => e.target.select()}
+                  onChange={(e) =>
+                    setTempAssumedVal(
+                      Number(e.target.value.replace(/^0+(?=\d)/, ""))
+                    )
+                  }
                   className="w-16 px-1.5 py-0.5 text-xs font-mono border rounded bg-white"
                   min={1}
                 />

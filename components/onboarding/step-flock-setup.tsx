@@ -146,6 +146,7 @@ export function StepFlockSetup({
           <input
             type="number"
             {...register("startingBirds", { valueAsNumber: true })}
+            onFocus={(e) => e.target.select()}
             placeholder="3000"
             className="w-full h-12 px-4 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-sm text-stone-900 transition-all font-mono font-medium"
           />

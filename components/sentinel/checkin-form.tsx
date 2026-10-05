@@ -57,7 +57,7 @@ export function CheckinForm({ batch, farm, weather }: CheckinFormProps) {
   const storageKey = `pankh_sentinel_draft_${batch.id}`;
 
   // Form State
-  const [mortality, setMortality] = useState<number>(0);
+  const [mortality, setMortality] = useState<number | string>(0);
   const [feedValue, setFeedValue] = useState<string>("");
   const [feedUnit, setFeedUnit] = useState<"KG" | "BAGS">("KG");
   const [waterValue, setWaterValue] = useState<string>("");
@@ -166,7 +166,8 @@ export function CheckinForm({ batch, farm, weather }: CheckinFormProps) {
   ];
 
   // Validation
-  const isMortalityInvalid = mortality > batch.currentBirds || mortality < 0;
+  const isMortalityInvalid =
+    Number(mortality) > batch.currentBirds || Number(mortality) < 0;
 
   // Photo handler
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -340,7 +341,13 @@ export function CheckinForm({ batch, farm, weather }: CheckinFormProps) {
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                onClick={() => setMortality(Math.max(0, mortality - 1))}
+                onClick={() => {
+                  const current =
+                    typeof mortality === "number"
+                      ? mortality
+                      : parseInt(mortality as string) || 0;
+                  setMortality(Math.max(0, current - 1));
+                }}
                 className="h-12 w-12 rounded-xl bg-stone-100 hover:bg-stone-200 border border-stone-200 flex items-center justify-center text-stone-700 transition-colors cursor-pointer shrink-0"
               >
                 <Minus className="h-5 w-5" />
@@ -352,7 +359,14 @@ export function CheckinForm({ batch, farm, weather }: CheckinFormProps) {
                 min="0"
                 max={batch.currentBirds}
                 value={mortality}
-                onChange={(e) => setMortality(parseInt(e.target.value) || 0)}
+                onFocus={(e) => e.target.select()}
+                onBlur={() => {
+                  if (mortality === "") setMortality(0);
+                }}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/^0+(?=\d)/, "");
+                  setMortality(val === "" ? "" : parseInt(val) || 0);
+                }}
                 className={cn(
                   "flex-1 h-12 px-4 rounded-xl border-2 text-center text-lg font-mono font-bold transition-all outline-hidden",
                   isMortalityInvalid
@@ -365,9 +379,13 @@ export function CheckinForm({ batch, farm, weather }: CheckinFormProps) {
 
               <button
                 type="button"
-                onClick={() =>
-                  setMortality(Math.min(batch.currentBirds, mortality + 1))
-                }
+                onClick={() => {
+                  const current =
+                    typeof mortality === "number"
+                      ? mortality
+                      : parseInt(mortality as string) || 0;
+                  setMortality(Math.min(batch.currentBirds, current + 1));
+                }}
                 className="h-12 w-12 rounded-xl bg-stone-100 hover:bg-stone-200 border border-stone-200 flex items-center justify-center text-stone-700 transition-colors cursor-pointer shrink-0"
               >
                 <Plus className="h-5 w-5" />
@@ -408,7 +426,10 @@ export function CheckinForm({ batch, farm, weather }: CheckinFormProps) {
                 step="any"
                 min="0"
                 value={feedValue}
-                onChange={(e) => setFeedValue(e.target.value)}
+                onFocus={(e) => e.target.select()}
+                onChange={(e) =>
+                  setFeedValue(e.target.value.replace(/^0+(?=\d)/, ""))
+                }
                 placeholder={s.feedPlaceholder}
                 className="w-full h-12 px-4 rounded-xl border-2 border-stone-200 focus:border-pankh-marigold bg-white text-pankh-clay text-sm sm:text-base font-mono font-semibold transition-all outline-hidden"
               />
@@ -455,7 +476,10 @@ export function CheckinForm({ batch, farm, weather }: CheckinFormProps) {
                 min="0"
                 disabled={waterUnknown}
                 value={waterValue}
-                onChange={(e) => setWaterValue(e.target.value)}
+                onFocus={(e) => e.target.select()}
+                onChange={(e) =>
+                  setWaterValue(e.target.value.replace(/^0+(?=\d)/, ""))
+                }
                 placeholder={waterUnknown ? "Not recorded today" : s.waterPlaceholder}
                 className={cn(
                   "w-full h-12 px-4 rounded-xl border-2 text-sm sm:text-base font-mono font-semibold transition-all outline-hidden",
@@ -494,7 +518,10 @@ export function CheckinForm({ batch, farm, weather }: CheckinFormProps) {
                   type="number"
                   min="0"
                   value={eggValue}
-                  onChange={(e) => setEggValue(e.target.value)}
+                  onFocus={(e) => e.target.select()}
+                  onChange={(e) =>
+                    setEggValue(e.target.value.replace(/^0+(?=\d)/, ""))
+                  }
                   placeholder={s.eggPlaceholder}
                   className="w-full h-12 px-4 rounded-xl border-2 border-stone-200 focus:border-pankh-marigold bg-white text-pankh-clay text-sm sm:text-base font-mono font-semibold transition-all outline-hidden"
                 />
@@ -586,7 +613,10 @@ export function CheckinForm({ batch, farm, weather }: CheckinFormProps) {
                 min="10"
                 max="55"
                 value={shedTemp}
-                onChange={(e) => setShedTemp(e.target.value)}
+                onFocus={(e) => e.target.select()}
+                onChange={(e) =>
+                  setShedTemp(e.target.value.replace(/^0+(?=\d)/, ""))
+                }
                 placeholder="e.g. 31.5"
                 className="w-full h-12 px-4 rounded-xl border-2 border-stone-200 focus:border-pankh-marigold bg-white text-pankh-clay text-sm sm:text-base font-mono font-semibold transition-all outline-hidden"
               />

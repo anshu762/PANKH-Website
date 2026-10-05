@@ -20,6 +20,7 @@ import { createTransactionAction } from "@/actions/economics";
 import { EXPENSE_CATEGORIES, REVENUE_CATEGORIES } from "@/schemas/economics";
 import { getCategoryLabel } from "@/lib/economics/calculations";
 import { cn } from "@/lib/utils";
+import { CustomSelect } from "@/components/ui/custom-select";
 
 interface TransactionAddFormProps {
   batches: BatchOption[];
@@ -278,17 +279,16 @@ export function TransactionAddForm({
             <Layers className="h-3.5 w-3.5 text-indigo-700" />
             {d.batchSelectorLabel}
           </label>
-          <select
+          <CustomSelect
             value={batchId}
-            onChange={(e) => setBatchId(e.target.value)}
-            className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
-          >
-            {batches.map((b) => (
-              <option key={b.id} value={b.id}>
-                {b.name} ({b.startingBirds} birds) — {b.status}
-              </option>
-            ))}
-          </select>
+            onChange={setBatchId}
+            options={batches.map((b) => ({
+              value: b.id,
+              label: `${b.name} (${b.startingBirds.toLocaleString("en-IN")} birds)`,
+              sublabel: `Flock Status: ${b.status}`,
+            }))}
+            placeholder="Select flock batch..."
+          />
         </div>
 
         {/* 2. Type Selector (Expense vs Revenue) */}
@@ -345,17 +345,15 @@ export function TransactionAddForm({
               </button>
             )}
           </div>
-          <select
+          <CustomSelect
             value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
-          >
-            {categoryList.map((cat) => (
-              <option key={cat} value={cat}>
-                {getCategoryLabel(cat)}
-              </option>
-            ))}
-          </select>
+            onChange={setCategory}
+            options={categoryList.map((cat) => ({
+              value: cat,
+              label: getCategoryLabel(cat),
+            }))}
+            placeholder="Select category..."
+          />
         </div>
 
         {/* 4. Amount Field (Prominent INR) */}
@@ -373,7 +371,10 @@ export function TransactionAddForm({
               min="0.01"
               required
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onFocus={(e) => e.target.select()}
+              onChange={(e) =>
+                setAmount(e.target.value.replace(/^0+(?=\d)/, ""))
+              }
               placeholder={d.amountPlaceholder}
               className="w-full pl-8 pr-4 py-2.5 bg-stone-50 border border-stone-300 rounded-xl font-mono text-base font-bold text-pankh-clay focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
@@ -390,7 +391,10 @@ export function TransactionAddForm({
               type="number"
               step="any"
               value={quantity}
-              onChange={(e) => handleQuantityChange(e.target.value)}
+              onFocus={(e) => e.target.select()}
+              onChange={(e) =>
+                handleQuantityChange(e.target.value.replace(/^0+(?=\d)/, ""))
+              }
               placeholder={d.qtyPlaceholder}
               className="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl font-mono text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />

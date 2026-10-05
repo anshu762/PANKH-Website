@@ -20,6 +20,7 @@ import {
   updateTransactionAction,
 } from "@/actions/economics";
 import { cn } from "@/lib/utils";
+import { CustomSelect } from "@/components/ui/custom-select";
 
 interface EconomicsTransactionTableProps {
   transactions: TransactionRecord[];
@@ -165,18 +166,21 @@ export function EconomicsTransactionTable({
 
           {/* Category Dropdown Filter */}
           {categories.length > 0 && (
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="bg-stone-50 border border-stone-200 rounded-xl px-2.5 py-1.5 text-xs text-stone-700 focus:outline-none cursor-pointer"
-            >
-              <option value="ALL">All Categories</option>
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {getCategoryLabel(cat).split("(")[0].trim()}
-                </option>
-              ))}
-            </select>
+            <div className="w-44">
+              <CustomSelect
+                value={selectedCategory}
+                onChange={setSelectedCategory}
+                options={[
+                  { value: "ALL", label: "All Categories" },
+                  ...categories.map((cat) => ({
+                    value: cat,
+                    label: getCategoryLabel(cat).split("(")[0].trim(),
+                  })),
+                ]}
+                placeholder="Category..."
+                triggerClassName="py-1.5 px-3 rounded-xl text-xs min-h-[38px] bg-stone-50 border-stone-200"
+              />
+            </div>
           )}
 
           <Link
@@ -298,14 +302,19 @@ export function EconomicsTransactionTable({
 
       {/* Quick Edit Modal */}
       {editingTx && (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-xl border border-stone-200">
-            <h4 className="font-serif text-lg font-bold text-pankh-clay">
-              Edit Transaction
-            </h4>
-            <p className="text-xs text-stone-500">
-              {getCategoryLabel(editingTx.category)} ({editingTx.type})
-            </p>
+        <div className="fixed inset-0 z-50 bg-stone-950/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-[#FAF9F5] rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-2xl border border-stone-200/90 animate-in zoom-in-95 duration-150">
+            <div>
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full">
+                {editingTx.type}
+              </span>
+              <h4 className="font-serif text-lg font-bold text-pankh-clay mt-1.5">
+                Edit Transaction
+              </h4>
+              <p className="text-xs text-stone-500">
+                {getCategoryLabel(editingTx.category)}
+              </p>
+            </div>
 
             <div className="space-y-3">
               <div>
@@ -315,8 +324,11 @@ export function EconomicsTransactionTable({
                 <input
                   type="number"
                   value={editAmount}
-                  onChange={(e) => setEditAmount(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-xl font-mono text-sm"
+                  onFocus={(e) => e.target.select()}
+                  onChange={(e) =>
+                    setEditAmount(e.target.value.replace(/^0+(?=\d)/, ""))
+                  }
+                  className="w-full px-3.5 py-2.5 bg-white border border-stone-300 rounded-xl font-mono text-sm font-bold text-pankh-clay focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-2xs"
                   min={1}
                 />
               </div>
@@ -329,17 +341,17 @@ export function EconomicsTransactionTable({
                   type="text"
                   value={editNote}
                   onChange={(e) => setEditNote(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-xl text-xs"
+                  className="w-full px-3.5 py-2.5 bg-white border border-stone-300 rounded-xl text-xs text-pankh-clay focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-2xs"
                   placeholder="Notes / Invoice"
                 />
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2">
+            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-stone-200/80">
               <button
                 type="button"
                 onClick={() => setEditingTx(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:bg-stone-100"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:bg-stone-100 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -347,7 +359,7 @@ export function EconomicsTransactionTable({
                 type="button"
                 disabled={isSubmittingEdit}
                 onClick={handleSaveEdit}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-pankh-indigo hover:bg-slate-900 text-white disabled:opacity-50"
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-pankh-indigo hover:bg-slate-900 text-white disabled:opacity-50 shadow-2xs transition-colors cursor-pointer"
               >
                 {isSubmittingEdit ? "Saving..." : "Save Changes"}
               </button>

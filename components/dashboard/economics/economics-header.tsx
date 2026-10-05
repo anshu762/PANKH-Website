@@ -14,6 +14,7 @@ import {
 import { useLanguage } from "@/hooks/use-language";
 import { BatchOption } from "@/types/economics";
 import { cn } from "@/lib/utils";
+import { CustomSelect } from "@/components/ui/custom-select";
 
 interface EconomicsHeaderProps {
   batches: BatchOption[];
@@ -109,18 +110,17 @@ export function EconomicsHeader({
             {d.batchSelectorLabel}:
           </span>
           <div className="relative flex-1 max-w-sm">
-            <select
+            <CustomSelect
               value={activeBatchId || ""}
-              onChange={(e) => onBatchChange(e.target.value)}
-              className="w-full appearance-none bg-stone-50 hover:bg-stone-100 border border-stone-300 rounded-xl px-3 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer pr-8"
-            >
-              {batches.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name} ({b.startingBirds} birds) — {b.status}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="h-4 w-4 text-stone-400 absolute right-2.5 top-2.5 pointer-events-none" />
+              onChange={onBatchChange}
+              options={batches.map((b) => ({
+                value: b.id,
+                label: `${b.name} (${b.startingBirds.toLocaleString("en-IN")} birds)`,
+                sublabel: `Flock Status: ${b.status}`,
+              }))}
+              placeholder="Select flock batch..."
+              triggerClassName="py-1.5 px-3 rounded-xl text-xs bg-stone-50 border-stone-200"
+            />
           </div>
         </div>
       )}
