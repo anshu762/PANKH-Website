@@ -14,7 +14,7 @@ interface FarmerSidebarProps {
 
 export function FarmerSidebar({ session }: FarmerSidebarProps) {
   return (
-    <aside className="hidden md:flex flex-col w-64 bg-[#FAF9F5] border-r border-stone-200/90 fixed inset-y-0 left-0 z-30 shadow-xs justify-between">
+    <aside className="hidden md:flex flex-col w-64 bg-[#FAF9F5] border-r border-stone-200/90 fixed inset-y-0 left-0 z-30 shadow-xs justify-between overflow-hidden">
       <div>
         {/* 1. Brand Logo & Seal Header */}
         <SidebarBrand />

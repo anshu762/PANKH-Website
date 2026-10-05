@@ -95,7 +95,7 @@ export function FarmerMobileBottomNav() {
                   isActive ? "text-pankh-marigold scale-110" : "text-stone-500"
                 )}
               />
-              <span className="text-[10px] tracking-tight leading-none text-center">
+              <span className="text-[10px] tracking-tight leading-none text-center px-0.5 truncate w-full">
                 {item.label}
               </span>
             </Link>

@@ -85,7 +85,7 @@ export function SidebarNavGroups() {
   };
 
   return (
-    <div className="flex-1 py-3 px-3 space-y-5 overflow-y-auto">
+    <div className="flex-1 py-2 px-3 space-y-4 overflow-y-auto no-scrollbar">
       {navSections.map((sec, secIdx) => (
         <div key={secIdx} className="space-y-1">
           <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-stone-400 font-mono block">

@@ -3,6 +3,7 @@
 import React from "react";
 import { usePathname } from "next/navigation";
 import { FarmerSidebar } from "./farmer-sidebar";
+import { FarmerDesktopHeader } from "./farmer-desktop-header";
 import { FarmerMobileHeader } from "./farmer-mobile-header";
 import { FarmerMobileBottomNav } from "./farmer-mobile-bottom-nav";
 import { OfflineBanner } from "@/components/common/offline-banner";
@@ -31,8 +32,11 @@ export function FarmerShell({ children, session }: FarmerShellProps) {
       <FarmerMobileHeader />
 
       {/* Main Content Area */}
-      <div className="flex-1 md:ml-64 flex flex-col min-h-screen pb-20 md:pb-8">
-        <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="flex-1 md:ml-64 flex flex-col min-h-screen pb-24 md:pb-8 overflow-x-hidden">
+        {/* Desktop Sticky Header */}
+        <FarmerDesktopHeader session={session} />
+
+        <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7">
           {children}
         </main>
       </div>

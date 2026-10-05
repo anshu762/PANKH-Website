@@ -4,7 +4,6 @@ import React from "react";
 import { signOut } from "next-auth/react";
 import { LogOut } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
-import { SidebarLanguageGrid } from "./sidebar-language-grid";
 import type { Session } from "next-auth";
 
 interface SidebarUserFooterProps {
@@ -19,12 +18,9 @@ export function SidebarUserFooter({ session }: SidebarUserFooterProps) {
   const email = session?.user?.email || "";
 
   return (
-    <div className="p-3.5 border-t border-stone-200/80 space-y-3 bg-white/70">
-      {/* 1. Zero-Overflow Language Grid */}
-      <SidebarLanguageGrid />
-
-      {/* 2. User Account Card */}
-      <div className="pt-2 border-t border-stone-200/60 flex items-center justify-between gap-2">
+    <div className="p-3 border-t border-stone-200/80 bg-white/70">
+      {/* User Account Card */}
+      <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="relative">
             <div className="h-8 w-8 rounded-full bg-amber-500/15 border border-amber-400 text-amber-800 font-bold text-xs flex items-center justify-center shrink-0">
