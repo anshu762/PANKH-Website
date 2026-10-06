@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { sendTwilioMessage, normalizeE164Phone } from "@/lib/connect/twilio";
+import { dispatchCaseSummary, normalizeE164Phone } from "@/lib/connect/whatsapp";
 
 export interface DispatchNotificationOptions {
   farmerId: string;
@@ -98,30 +98,16 @@ export async function dispatchNotification(
       `_Pankh Poultry Support System_`;
 
     try {
-      // Primary: Twilio WhatsApp
-      const twilioRes = await sendTwilioMessage({
+      // Direct WhatsApp Click-to-Chat payload generation
+      const waRes = await dispatchCaseSummary({
         toPhone: recipientPhone,
         messageText: formattedMessage,
         channel: "WHATSAPP",
       });
 
-      externalStatus = twilioRes.status;
-      whatsAppDispatched = twilioRes.success;
-      note = twilioRes.sandboxNotice;
-
-      // Secondary: Fallback to SMS if WhatsApp failed and allowSmsFallback is enabled
-      if (!twilioRes.success && allowSmsFallback) {
-        console.warn(
-          `[Notification Engine] WhatsApp failed for ${recipientPhone}. Triggering SMS fallback...`
-        );
-        const smsRes = await sendTwilioMessage({
-          toPhone: recipientPhone,
-          messageText: `[PANKH ALERT] ${title}: ${body}`,
-          channel: "SMS",
-        });
-        smsDispatched = smsRes.success;
-        if (smsRes.success) externalStatus = "SMS_FALLBACK_DELIVERED";
-      }
+      externalStatus = waRes.status;
+      whatsAppDispatched = waRes.success;
+      note = waRes.sandboxNotice;
 
       // Update in-app notification record with delivery markers
       await prisma.notification.update({

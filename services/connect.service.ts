@@ -9,7 +9,7 @@ import {
 import { CreateFarmerCaseInput } from "@/schemas/connect";
 import { generateCaseSummary } from "@/lib/connect/caseSummary";
 import { rankVetLabs, DEFAULT_PUNJAB_ORIGIN, GeoPoint } from "@/lib/connect/matching";
-import { sendTwilioMessage } from "@/lib/connect/twilio";
+import { dispatchCaseSummary } from "@/lib/connect/whatsapp";
 import { evaluateCaseStatusNotification } from "@/lib/notifications/rules";
 
 export class ConnectService {
@@ -378,8 +378,8 @@ export class ConnectService {
     const targetPhone =
       channel === "WHATSAPP" && vetLab.whatsapp ? vetLab.whatsapp : vetLab.phone;
 
-    // Dispatch via Twilio (or fallback simulation)
-    const dispatchResult = await sendTwilioMessage({
+    // Dispatch via Native WhatsApp Click-to-Chat engine
+    const dispatchResult = await dispatchCaseSummary({
       toPhone: targetPhone,
       messageText: summaryText,
       channel,
@@ -420,6 +420,7 @@ export class ConnectService {
                 recipientPhone: targetPhone,
                 channel,
                 dispatchStatus: dispatchResult.status,
+                whatsappUrl: dispatchResult.whatsappUrl,
                 messageSid: dispatchResult.messageSid,
               })
             ),

@@ -229,24 +229,16 @@ async function runConnectTests() {
     actorUserId: demoFarmer.userId,
   });
 
-  const isTwilioTrialRestricted =
-    !dispatchResult.result.success &&
-    Boolean(
-      dispatchResult.result.error?.toLowerCase().includes("trial") ||
-        dispatchResult.result.error?.toLowerCase().includes("verified recipient") ||
-        dispatchResult.result.error?.toLowerCase().includes("sandbox")
-    );
-
   assert(
     Boolean(
-      (dispatchResult.result.success &&
-        (dispatchResult.result.status === "SENT" || dispatchResult.result.status === "SIMULATED")) ||
-        isTwilioTrialRestricted
+      dispatchResult.result.success &&
+        (dispatchResult.result.status === "READY" ||
+          dispatchResult.result.status === "SENT" ||
+          dispatchResult.result.status === "SIMULATED") &&
+        dispatchResult.result.whatsappUrl
     ),
-    "Case summary successfully dispatched via Twilio WhatsApp client / sandbox simulation",
-    isTwilioTrialRestricted
-      ? `Live Twilio API credentials verified! (Trial account restriction handled: ${dispatchResult.result.error})`
-      : `Status: ${dispatchResult.result.status}, SID: ${dispatchResult.result.messageSid}`
+    "Case summary successfully generated via Zero-Cost Native WhatsApp (wa.me) Click-to-Chat engine",
+    `Status: ${dispatchResult.result.status}, WhatsApp Link: ${dispatchResult.result.whatsappUrl?.substring(0, 50)}...`
   );
 
   assert(

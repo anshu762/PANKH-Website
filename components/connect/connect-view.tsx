@@ -19,7 +19,7 @@ import {
   CheckCircle2,
   Clock,
 } from "lucide-react";
-import { sendCaseSummaryAction } from "@/actions/connect";
+import { sendCaseSummaryAction, createFarmerCaseAction } from "@/actions/connect";
 import Link from "next/link";
 
 interface ConnectViewProps {
@@ -89,16 +89,56 @@ export function ConnectView({
 
   const currentActiveCase = cases.find((c) => c.id === activeCaseId) || cases[0] || null;
 
-  const handleOpenConsent = (vet: VetLabDistanceResult) => {
+  const handleOpenConsent = async (vet: VetLabDistanceResult) => {
     setSelectedVetForConsent(vet);
-    setIsConsentModalOpen(true);
+    if (currentActiveCase) {
+      setIsConsentModalOpen(true);
+    } else if (initialContext.batch) {
+      // Auto-create initial flock review case so farmer can immediately share telemetry
+      try {
+        const created = await createFarmerCaseAction({
+          batchId: initialContext.batch.id,
+          symptomsDescription: "Flock health review and clinical telemetry consultation.",
+          selectedSymptoms: ["Flock Health Consultation"],
+        });
+        if (created.success && created.caseRecord) {
+          const newCase = created.caseRecord as CaseWithRelations;
+          setCases((prev) => [newCase, ...prev]);
+          setActiveCaseId(newCase.id);
+          setIsConsentModalOpen(true);
+        } else {
+          setIsNewCaseModalOpen(true);
+        }
+      } catch {
+        setIsNewCaseModalOpen(true);
+      }
+    } else {
+      setIsNewCaseModalOpen(true);
+    }
   };
 
   const handleConfirmDispatch = async (preferredChannel: "WHATSAPP" | "SMS") => {
-    if (!currentActiveCase || !selectedVetForConsent) return;
+    let targetCase = currentActiveCase || cases[0] || null;
+    if (!targetCase && initialContext.batch) {
+      const created = await createFarmerCaseAction({
+        batchId: initialContext.batch.id,
+        symptomsDescription: "Flock health review and clinical telemetry consultation.",
+        selectedSymptoms: ["Flock Health Consultation"],
+      });
+      if (created.success && created.caseRecord) {
+        targetCase = created.caseRecord as CaseWithRelations;
+        setCases((prev) => [targetCase!, ...prev]);
+        setActiveCaseId(targetCase.id);
+      }
+    }
+
+    if (!targetCase || !selectedVetForConsent) {
+      alert("Please create a flock case first.");
+      return null;
+    }
 
     const res = await sendCaseSummaryAction({
-      caseId: currentActiveCase.id,
+      caseId: targetCase.id,
       vetLabId: selectedVetForConsent.id,
       consentGiven: true,
       preferredChannel,
@@ -113,8 +153,10 @@ export function ConnectView({
         `Case summary dispatched to ${selectedVetForConsent.name} via ${preferredChannel}. Status updated to Contacted.`
       );
       setTimeout(() => setSuccessBanner(null), 8000);
+      return res.result;
     } else {
       alert(res.error || "Failed to dispatch case summary.");
+      return null;
     }
   };
 
@@ -249,7 +291,7 @@ export function ConnectView({
         <VetList
           vets={initialVets}
           onShareCase={handleOpenConsent}
-          canShare={!!currentActiveCase}
+          canShare={true}
         />
       </div>
 

@@ -3,6 +3,7 @@
 import React from "react";
 import { VetLabDistanceResult } from "@/types/connect";
 import { useLanguage } from "@/hooks/use-language";
+import { cleanPhoneForWhatsApp } from "@/lib/connect/whatsapp";
 import {
   Phone,
   MessageSquare,
@@ -45,7 +46,7 @@ export function VetCard({ vet, onShareCase, canShare = true }: VetCardProps) {
         )}`;
 
   const cleanPhone = vet.phone.replace(/[^0-9+]/g, "");
-  const cleanWhatsapp = (vet.whatsapp || vet.phone).replace(/[^0-9]/g, "");
+  const cleanWhatsapp = cleanPhoneForWhatsApp(vet.whatsapp || vet.phone);
 
   return (
     <div className="bg-white border border-stone-200/90 rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between space-y-4">
@@ -167,7 +168,7 @@ export function VetCard({ vet, onShareCase, canShare = true }: VetCardProps) {
         </div>
 
         {/* 2. Prominent Primary Action: Share Case Summary */}
-        {canShare && onShareCase && (
+        {onShareCase && (
           <button
             type="button"
             onClick={() => onShareCase(vet)}

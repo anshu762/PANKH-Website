@@ -96,8 +96,10 @@ export function CaseDetailView({
         `Case summary dispatched to ${selectedVetForConsent.name} via ${preferredChannel}.`
       );
       setTimeout(() => setActionSuccessMsg(null), 8000);
+      return res.result;
     } else {
       alert(res.error || "Failed to dispatch summary");
+      return null;
     }
   };
 

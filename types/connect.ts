@@ -62,9 +62,11 @@ export interface SendCaseSummaryInput {
 export interface SendCaseSummaryResult {
   success: boolean;
   messageSid?: string;
-  status: "SENT" | "SIMULATED" | "FAILED";
+  status: "READY" | "SENT" | "SIMULATED" | "FAILED";
   channel: "WHATSAPP" | "SMS";
   recipientPhone: string;
+  whatsappUrl?: string;
+  summaryText?: string;
   sandboxNotice?: string;
   error?: string;
 }
