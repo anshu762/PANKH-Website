@@ -15,7 +15,7 @@ import { PUNJABI_TERM_EXPANSIONS } from "@/constants/ai";
 export type { RetrievalFilters, RetrievedChunk };
 
 /**
- * Normalizes farmer queries with Punjabi/Hinglish domain terms to enrich retrieval keywords.
+ * Normalizes farmer queries with Punjabi/Hindi domain terms to enrich retrieval keywords.
  */
 export function normalizeQueryForRetrieval(query: string): string {
   const q = query.toLowerCase();

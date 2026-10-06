@@ -40,7 +40,7 @@
 In Punjab and North India, poultry farmers (broiler and layer) manage thousands of birds. However:
 1. **Sudden Disease Outbreaks**: Devastating viral infections like Newcastle Disease (Ranikhet) or Gumboro (IBD) can wipe out an entire flock (2,000–5,000 birds) in 48 hours if sub-clinical signs (water drop, feed reduction) are missed.
 2. **Informal & Misleading Advice**: Farmers often panic and purchase unverified, expensive antibiotics from informal medicine shops, worsening mortality and causing antimicrobial resistance.
-3. **Language & Usability Barrier**: Most farm software is built in complex technical English designed for desktop computers. Rural farmers need a mobile-first, voice-enabled assistant in their mother tongue (**Punjabi** and **Hindi/Hinglish**).
+3. **Language & Usability Barrier**: Most farm software is built in complex technical English designed for desktop computers. Rural farmers need a mobile-first, voice-enabled assistant in their mother tongue (**Punjabi** and **Hindi**).
 4. **Opaque Financial Tracking**: Farmers rarely know their actual **FCR (Feed Conversion Ratio)** or **Cost per Bird** until harvest, leading to unpredictable losses when market wholesale prices fluctuate.
 
 ### The Solution
@@ -296,7 +296,7 @@ PANKH features local state draft persistence. If a farmer fills out the 60-Secon
 **No.** Veterinarians receive structured, bilingual clinical summaries directly on their standard WhatsApp. They can read the bird age, water drop %, and symptoms, and reply or call the farmer back immediately.
 
 ### Q4: Can PANKH support other languages in the future?
-**Yes.** PANKH’s translation and prompt architecture currently supports **Punjabi**, **Hindi/Hinglish**, and **English**. It is architected to easily expand to Marathi, Telugu, Bengali, and other regional languages by extending the language dictionaries.
+**Yes.** PANKH’s translation and prompt architecture currently supports **Punjabi**, **Hindi**, and **English**. It is architected to easily expand to Marathi, Telugu, Bengali, and other regional languages by extending the language dictionaries.
 
 ---
 

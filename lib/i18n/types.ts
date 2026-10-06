@@ -1,4 +1,4 @@
-export type SupportedLanguage = "pa" | "en" | "hi" | "hinglish";
+export type SupportedLanguage = "pa" | "en" | "hi";
 
 export interface LanguageInfo {
   code: SupportedLanguage;

@@ -49,12 +49,11 @@ export function FarmerProfileView({
 
     const enumMap: Record<
       SupportedLanguage,
-      "PUNJABI" | "ENGLISH" | "HINDI" | "HINGLISH"
+      "PUNJABI" | "ENGLISH" | "HINDI"
     > = {
       pa: "PUNJABI",
       en: "ENGLISH",
       hi: "HINDI",
-      hinglish: "HINGLISH",
     };
 
     await updateFarmerProfile({ preferredLanguage: enumMap[newLang] });
@@ -334,12 +333,11 @@ export function FarmerProfileView({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[
             { code: "pa" as const, title: "ਪੰਜਾਬੀ", subtitle: "Punjabi (Gurmukhi)" },
             { code: "en" as const, title: "English", subtitle: "International English" },
             { code: "hi" as const, title: "हिन्दी", subtitle: "Standard Hindi" },
-            { code: "hinglish" as const, title: "Hinglish", subtitle: "Farmer Conversational" },
           ].map((item) => {
             const isSelected = lang === item.code;
             return (

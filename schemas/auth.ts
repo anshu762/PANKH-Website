@@ -18,7 +18,7 @@ export const registerSchema = z.object({
     .or(z.literal("")),
   role: z.enum(["FARMER", "VET", "ADMIN", "SUPER_ADMIN"]).default("FARMER"),
   preferredLanguage: z
-    .enum(["PUNJABI", "HINGLISH", "HINDI", "ENGLISH"])
+    .enum(["PUNJABI", "HINDI", "ENGLISH"])
     .default("PUNJABI"),
   village: z.string().min(2, "Village name is required"),
   district: z.string().min(2, "District is required"),

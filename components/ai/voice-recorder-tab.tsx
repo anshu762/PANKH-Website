@@ -54,7 +54,7 @@ export function VoiceRecorderTab({ onSendTranscript, isLoading, onCancel }: Voic
             {dict.tabVoice}
           </h3>
           <p className="text-[11px] text-stone-500">
-            Speak in Punjabi, Hindi, or mixed Hinglish. Review before submitting.
+            Speak in Punjabi, Hindi, or English. Review before submitting.
           </p>
         </div>
         {onCancel && (
@@ -162,7 +162,7 @@ export function VoiceRecorderTab({ onSendTranscript, isLoading, onCancel }: Voic
               <span>{dict.voiceReviewTitle}</span>
               {detectedLanguage && (
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-bold lowercase">
-                  {detectedLanguage === "pa-IN" ? "ਪੰਜਾਬੀ (pa-IN)" : "हिंदी / Hinglish"}
+                  {detectedLanguage === "pa-IN" ? "ਪੰਜਾਬੀ (pa-IN)" : "हिंदी (hi-IN)"}
                   {confidence ? ` • ${confidence}% match` : ""}
                 </span>
               )}

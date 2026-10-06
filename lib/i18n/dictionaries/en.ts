@@ -64,7 +64,7 @@ export const enDictionary: Dictionary = {
       coreOutputLabel: "Core Farmer Output",
       ai: {
         badge: "Pankh AI • Voice & Text",
-        pill: "Gurmukhi + Hinglish",
+        pill: "Gurmukhi + Hindi + English",
         title: "Speak your flock symptoms in Punjabi. Get certified veterinary guidance.",
         desc: "Trained on approved Indian Council of Agricultural Research (ICAR) and GADVASU poultry protocols. Never guesses or invents medicine names.",
         output: "Deterministic 6-step response (Answer → Why → What to do → Ask → Escalate → Source) with explicit first-aid checks.",
@@ -104,7 +104,7 @@ export const enDictionary: Dictionary = {
       title: "How Pankh AI answers — deterministic, structured, verified.",
       subtitle:
         "Every health answer follows an unbreachable 6-step protocol. No casual conversation, no guessing, no raw LLM memory.",
-      questionContext: "Real Farmer Voice Query (Hinglish / Sangrur District)",
+      questionContext: "Real Farmer Voice Query (Sangrur District)",
       questionText:
         "“Bhai, 4 din ke broiler chicks hain, corner me ikkattha ho rahe hain aur daana kam kha rahe hain. Kya antibiotic de dein?”",
       step1: {
@@ -171,7 +171,7 @@ export const enDictionary: Dictionary = {
       badge: "Built for Dusty Hands & Sunlight",
       title: "True Punjabi-first accessibility for real farmers in the shed.",
       desc: "Most software assumes an English-speaking office worker with fast Wi-Fi. Pankh is engineered for a poultry farmer standing inside an 80-meter shed with gloves on.",
-      feature1Title: "Punjabi & Hinglish Voice Input",
+      feature1Title: "Punjabi & Hindi Voice Input",
       feature1Desc:
         "Speak your daily mortality counts and symptoms directly into the microphone. Voice transcription works seamlessly with regional Punjabi accents.",
       feature2Title: "Large 48px+ Touch Targets & High Contrast",
@@ -182,7 +182,7 @@ export const enDictionary: Dictionary = {
         "Network drop in the rural fields? No data is ever lost. Every health log and expense entry persists locally and syncs automatically when network reconnects.",
       demoLabel: "Interactive Language Preview",
       demoHint:
-        "Try switching languages above — Pankh renders native Punjabi script and conversational Hinglish without distorted formatting.",
+        "Try switching languages above — Pankh renders native Punjabi script, Hindi, and English without distorted formatting.",
     },
     footer: {
       desc: "A Punjabi-first poultry farm support platform integrating Pankh AI, early Sentinel risk alerts, verified veterinary escalation, and batch flock economics.",

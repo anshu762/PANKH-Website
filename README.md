@@ -144,7 +144,7 @@ npx tsc --noEmit
 Use this sequence to present Pankh during live evaluations or portfolio demonstrations:
 
 1. **The Agrarian Landing Page (`/`)**:
-   - Point out the Gurmukhi / Punjabi typography, mustard field color palette, and language switcher (ਪੰਜਾਬੀ, English, हिंदी, Hinglish).
+   - Point out the Gurmukhi / Punjabi typography, mustard field color palette, and language switcher (ਪੰਜਾਬੀ, English, हिंदी).
    - Click **"ਕਿਸਾਨ ਲੌਗਇਨ (Farmer Login)"** and sign in with `farmer@pankh.app` (Password: `PankhAdmin2026!`).
 
 2. **Farmer Dashboard & Live Pulse Bar (`/dashboard`)**:

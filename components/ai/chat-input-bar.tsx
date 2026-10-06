@@ -20,7 +20,7 @@ export function ChatInputBar({
   onChange,
   onSend,
   disabled = false,
-  placeholder = "ਸਵਾਲ ਪੁੱਛੋ / Ask in Punjabi, Hinglish, or English...",
+  placeholder = "ਸਵਾਲ ਪੁੱਛੋ / Ask in Punjabi, Hindi, or English...",
 }: ChatInputBarProps) {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const { lang } = useLanguage();
@@ -34,7 +34,7 @@ export function ChatInputBar({
 
   // Automatically map user's selected platform language to speech recognition language
   const sttLanguage: "pa-IN" | "hi-IN" | "en-IN" =
-    lang === "hi" || lang === "hinglish"
+    lang === "hi"
       ? "hi-IN"
       : lang === "en"
       ? "en-IN"
@@ -331,7 +331,7 @@ export function ChatInputBar({
 
       {/* Subtle Bottom Helper Hint */}
       <div className="flex items-center justify-between px-3 text-[11px] text-stone-400">
-        <span>ਪੰਜਾਬੀ, Hinglish, ਜਾਂ English ਵਿੱਚ ਬੋਲੋ ਜਾਂ ਲਿਖੋ</span>
+        <span>ਪੰਜਾਬੀ, हिंदी, ਜਾਂ English ਵਿੱਚ ਬੋਲੋ ਜਾਂ ਲਿਖੋ</span>
         <span className="hidden sm:inline">Press Enter ↵ to send</span>
       </div>
     </div>

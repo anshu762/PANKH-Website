@@ -186,7 +186,7 @@ export async function updateFarmerProfile(data: {
   village?: string;
   district?: string;
   state?: string;
-  preferredLanguage?: "PUNJABI" | "HINGLISH" | "HINDI" | "ENGLISH";
+  preferredLanguage?: "PUNJABI" | "HINDI" | "ENGLISH";
 }) {
   const session = await auth();
   if (!session?.user?.id) {

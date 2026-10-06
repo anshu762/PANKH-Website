@@ -133,7 +133,6 @@ export default function RegisterPage() {
       // Sync UI language context with preferredLanguage
       if (values.preferredLanguage === "PUNJABI") setLanguage("pa");
       else if (values.preferredLanguage === "HINDI") setLanguage("hi");
-      else if (values.preferredLanguage === "HINGLISH") setLanguage("hinglish");
       else if (values.preferredLanguage === "ENGLISH") setLanguage("en");
 
       // Clear local draft upon success
@@ -321,7 +320,6 @@ export default function RegisterPage() {
                   {...register("preferredLanguage")}
                 >
                   <option value="PUNJABI">ਪੰਜਾਬੀ (Punjabi)</option>
-                  <option value="HINGLISH">Hinglish</option>
                   <option value="HINDI">हिन्दी (Hindi)</option>
                   <option value="ENGLISH">English</option>
                 </select>

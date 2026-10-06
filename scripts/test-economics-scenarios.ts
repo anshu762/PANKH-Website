@@ -5,7 +5,7 @@
  * 1. Pure deterministic math calculations matching manual calculations down to the exact paisa.
  * 2. Strict Financial Safety rules (missing data labeled, FCR null without weigh-ins, assumptions explicit).
  * 3. Rule-based deterministic insight generation and comparative batch deltas.
- * 4. Multilingual localized agrarian sentence synthesis (Punjabi, Hinglish, Hindi).
+ * 4. Multilingual localized agrarian sentence synthesis (Punjabi, Hindi, English).
  * 5. End-to-end database service operations (querying, creating, updating, deleting transactions).
  */
 
@@ -241,7 +241,7 @@ async function runEconomicsScenarioTests() {
     `Label: "${mortInsight?.assumptionLabel}"`
   );
 
-  // Test Punjabi and Hinglish localized sentence output
+  // Test Punjabi and Hindi localized sentence output
   const paSentence = getDeterministicLocalizedInsightBody(feedInsight!, "pa");
   assert(
     paSentence.includes("66.5%") && paSentence.includes("ਫ਼ੀਡ"),
@@ -249,11 +249,11 @@ async function runEconomicsScenarioTests() {
     `Gurmukhi: "${paSentence}"`
   );
 
-  const hinglishSentence = getDeterministicLocalizedInsightBody(feedInsight!, "hinglish");
+  const hiSentence = getDeterministicLocalizedInsightBody(feedInsight!, "hi");
   assert(
-    hinglishSentence.includes("66.5%") && hinglishSentence.includes("feed ka hissa"),
-    "Hinglish localized sentence retains exact deterministic figures",
-    `Hinglish: "${hinglishSentence}"`
+    hiSentence.includes("66.5%") && hiSentence.includes("दाने (feed) का हिस्सा"),
+    "Hindi localized sentence retains exact deterministic figures",
+    `Hindi: "${hiSentence}"`
   );
 
   // -------------------------------------------------------------

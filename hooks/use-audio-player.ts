@@ -24,10 +24,10 @@ function detectSpeechLanguage(text: string): "pa-IN" | "hi-IN" | "en-IN" {
   if (/[\u0A00-\u0A7F]/.test(text)) return "pa-IN";
   if (/[\u0900-\u097F]/.test(text)) return "hi-IN";
 
-  // Check if Latin text contains common Hinglish poultry terms
-  const hinglishPattern =
+  // Check if Latin text contains common Hindi poultry terms
+  const hindiLatinPattern =
     /\b(?:aap|aapke|kisan|murgi|murgiyo|chooje|chooja|daana|dana|paani|pani|bimaar|bimari|dawai|karein|kare|hai|hain|nahi|zaroori|aur|dhyan|rakhein|lakshan|doctor)\b/i;
-  if (hinglishPattern.test(text)) {
+  if (hindiLatinPattern.test(text)) {
     return "hi-IN";
   }
 

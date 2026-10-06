@@ -155,7 +155,7 @@ AI Doctor ka 6-Step answer format verify karna, check karna ki wo kabhi confirme
      - **Speaker Button (ਸੁਣੋ)**: Top right par Speaker button dabane par Punjabi voice me sun sakte hain.
 
 #### Step 4.2: Manual Typing & Auto-Resize Input Box Test
-1. Niche input box me apna koi bhi sawal type kare (Punjabi, Hinglish ya English):
+1. Niche input box me apna koi bhi sawal type kare (Punjabi, Hindi ya English):
    ```
    Mere chooje thode sust hain aur bura daana kam kha rahe hain, kya karein?
    ```

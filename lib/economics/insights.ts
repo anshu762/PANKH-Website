@@ -4,7 +4,7 @@
  * Strict Financial Safety Rules (brief 6.3 & AGENTS.md):
  * 1. Financial calculation and insight numbers must be 100% deterministic.
  * 2. LLMs NEVER calculate or alter numbers.
- * 3. Optional OpenRouter step is used ONLY to polish agrarian tone in Punjabi/Hinglish.
+ * 3. Optional OpenRouter step is used ONLY to polish agrarian tone in Punjabi/Hindi.
  * 4. All assumptions are explicitly labeled.
  */
 
@@ -171,17 +171,17 @@ export function generateDeterministicInsights(
 
 /**
  * Optional OpenRouter tone polishing:
- * Takes deterministic insight and rewrites the sentence in natural agrarian Punjabi/Hinglish.
+ * Takes deterministic insight and rewrites the sentence in natural agrarian Punjabi/Hindi.
  * NEVER alters the underlying numbers.
  */
 export async function rephraseInsightWithTone(
   insight: EconomicsInsight,
-  language: "pa" | "hinglish" | "hi" | "en" = "hinglish"
+  language: "pa" | "hi" | "en" = "pa"
 ): Promise<string> {
   if (language !== "en") {
     try {
       const systemPrompt = `You are a Punjabi poultry farming economics assistant. 
-TASK: Rephrase the provided poultry financial insight sentence into a natural, respectful, supportive ${language === "pa" ? "Punjabi (Gurmukhi)" : language === "hi" ? "Hindi (Devanagari)" : "Hinglish (conversational North Indian)"} tone for a farmer.
+TASK: Rephrase the provided poultry financial insight sentence into a natural, respectful, supportive ${language === "pa" ? "Punjabi (Gurmukhi)" : "Hindi (Devanagari)"} tone for a farmer.
 
 CRITICAL HARD RULE: You must PRESERVE EVERY SINGLE NUMBER AND CURRENCY EXACTLY AS WRITTEN. NEVER change, round, or recalculate any numbers, percentages, or rupee amounts.
 Output ONLY the rephrased sentence text, nothing else.`;
@@ -211,7 +211,7 @@ Output ONLY the rephrased sentence text, nothing else.`;
  */
 export function getDeterministicLocalizedInsightBody(
   insight: EconomicsInsight,
-  language: "pa" | "hinglish" | "hi" | "en"
+  language: "pa" | "hi" | "en"
 ): string {
   const nums = insight.deterministicNumbers;
 
@@ -219,8 +219,6 @@ export function getDeterministicLocalizedInsightBody(
     switch (language) {
       case "pa":
         return `ਤੁਹਾਡੇ ਬੈਚ ਦੇ ਕੁੱਲ ਖ਼ਰਚੇ (₹${Number(nums.totalCost || 0).toLocaleString("en-IN")}) ਵਿੱਚੋਂ ਫ਼ੀਡ ਦਾ ਹਿੱਸਾ ${nums.feedShare}% (₹${Number(nums.feedCost || 0).toLocaleString("en-IN")}) ਹੈ।`;
-      case "hinglish":
-        return `Aapke batch ke kul kharche (₹${Number(nums.totalCost || 0).toLocaleString("en-IN")}) me se feed ka hissa ${nums.feedShare}% (₹${Number(nums.feedCost || 0).toLocaleString("en-IN")}) hai.`;
       case "hi":
         return `आपके बैच के कुल खर्च (₹${Number(nums.totalCost || 0).toLocaleString("en-IN")}) में से दाने (feed) का हिस्सा ${nums.feedShare}% (₹${Number(nums.feedCost || 0).toLocaleString("en-IN")}) है।`;
       default:
@@ -232,8 +230,6 @@ export function getDeterministicLocalizedInsightBody(
     switch (language) {
       case "pa":
         return `ਬੈਚ ਵਿੱਚ ਕੁੱਲ ਮੋਰਟੈਲਿਟੀ ${nums.mortalityRate}% (${nums.deaths} ਮੁਰਗੇ) ਹੋਈ ਹੈ। ₹${nums.assumedBirdVal}/ਮੁਰਗੇ ਦੇ ਹਿਸਾਬ ਨਾਲ ਲਗਭਗ ₹${Number(nums.mortalityLoss || 0).toLocaleString("en-IN")} ਦਾ ਨੁਕਸਾਨ ਹੋਇਆ ਹੈ।`;
-      case "hinglish":
-        return `Batch me mortality ${nums.mortalityRate}% (${nums.deaths} birds) ho chuki hai. ₹${nums.assumedBirdVal}/bird ke hisab se lagbhag ₹${Number(nums.mortalityLoss || 0).toLocaleString("en-IN")} ka bachaane yog nuksan hua hai.`;
       case "hi":
         return `बैच में कुल मृत्यु दर ${nums.mortalityRate}% (${nums.deaths} चूजे/मुर्गे) हो चुकी है। ₹${nums.assumedBirdVal}/पक्षी के हिसाब से लगभग ₹${Number(nums.mortalityLoss || 0).toLocaleString("en-IN")} का नुकसान हुआ है।`;
       default:
@@ -245,8 +241,6 @@ export function getDeterministicLocalizedInsightBody(
     switch (language) {
       case "pa":
         return `ਪਾਏ ਗਏ ਮੁਰਗਿਆਂ ਅਨੁਸਾਰ ਲਾਗਤ ₹${Number(nums.costPerPlaced || 0).toFixed(2)} ਸੀ, ਪਰ ${nums.deaths} ਮੌਤਾਂ ਕਾਰਨ ਬਚੇ ਮੁਰਗਿਆਂ 'ਤੇ ਲਾਗਤ ਵਧ ਕੇ ₹${Number(nums.costPerSurviving || 0).toFixed(2)} ਹੋ ਗਈ ਹੈ।`;
-      case "hinglish":
-        return `Chicks daalne ke samay prati bird lagat ₹${Number(nums.costPerPlaced || 0).toFixed(2)} thi, par ${nums.deaths} deaths ki wajah se bache hue pakshiyon par lagat badhkar ₹${Number(nums.costPerSurviving || 0).toFixed(2)} ho gayi hai.`;
       case "hi":
         return `प्रति डाले गए पक्षी पर लागत ₹${Number(nums.costPerPlaced || 0).toFixed(2)} थी, लेकिन ${nums.deaths} मौतों के कारण जीवित पक्षियों पर प्रति पक्षी लागत बढ़कर ₹${Number(nums.costPerSurviving || 0).toFixed(2)} हो गई है।`;
       default:

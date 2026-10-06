@@ -79,18 +79,6 @@ export function VoiceAssistantOverlay({
       done: "रोकें (Done)",
       send: "भेजें / Ask",
     },
-    hinglish: {
-      processing: "Processing audio...",
-      hearing: "Sun raha hai... / Hearing you...",
-      pause: "Pause mila... / Completing...",
-      listening: "Listening... Boliye",
-      autoStopHint: "Bolna band karne par automatically ruk jayega",
-      pauseCompletingHint: "Completing on pause...",
-      emptyPlaceholder: "Bolna shuru karein (e.g. 'Chicks coughing issue' ya 'FCR advice')...",
-      cancel: "Cancel",
-      done: "Done",
-      send: "Ask / Bhejo",
-    },
     en: {
       processing: "Processing audio...",
       hearing: "Hearing your voice...",

@@ -18,11 +18,6 @@ export const SUPPORTED_LANGUAGES: LanguageInfo[] = [
     name: "Hindi",
     nativeName: "हिन्दी",
   },
-  {
-    code: "hinglish",
-    name: "Hinglish",
-    nativeName: "Hinglish",
-  },
 ];
 
 export const LANGUAGE_COOKIE_NAME = "pankh_lang";

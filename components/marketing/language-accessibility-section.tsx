@@ -42,12 +42,6 @@ export function LanguageAccessibilitySection() {
       audioPrompt: "आवाज़ सुनें: 'मुर्गियों का पानी कम हो रहा है, तुरंत तापमान चेक करें...'",
       source: "पंख सेंटिनल अलर्ट • लुधियाना ज़िला",
     },
-    hinglish: {
-      title: "Shed #2 Warning: Feed Aur Mortality Alert",
-      body: "Aaj mortality 0.6% record hui hai aur paani ka intake 12% gira hai. Brooder temperature 33°C par layein aur turant vet se consult karein.",
-      audioPrompt: "Voice prompt: 'Chicks paani kam pee rahe hain, turant ventilation check karein...'",
-      source: "Pankh Sentinel Alert • Ludhiana District",
-    },
   };
 
   const currentAlert = demoAlerts[activeDemoLang];
@@ -140,7 +134,6 @@ export function LanguageAccessibilitySection() {
                       { code: "pa", label: "ਪੰਜਾਬੀ" },
                       { code: "en", label: "English" },
                       { code: "hi", label: "हिन्दी" },
-                      { code: "hinglish", label: "Hinglish" },
                     ] as const
                   ).map((opt) => (
                     <button

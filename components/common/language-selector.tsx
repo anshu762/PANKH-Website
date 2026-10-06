@@ -23,7 +23,6 @@ const LANGUAGE_OPTIONS: LanguageOption[] = [
   { code: "pa", label: "ਪੰਜਾਬੀ", mobileLabel: "ਪੰਜਾਬੀ", nativeName: "ਪੰਜਾਬੀ (Gurmukhi)" },
   { code: "en", label: "English", mobileLabel: "EN", nativeName: "English" },
   { code: "hi", label: "हिन्दी", mobileLabel: "हिन्दी", nativeName: "हिन्दी (Hindi)" },
-  { code: "hinglish", label: "Hinglish", mobileLabel: "Hing", nativeName: "Hinglish" },
 ];
 
 export function LanguageSelector({
