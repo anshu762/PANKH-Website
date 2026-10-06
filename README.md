@@ -2,6 +2,8 @@
 
 > **A Punjabi-first, offline-resilient poultry farm operating platform designed to prevent catastrophic flock disease mortality and protect farmer margins across Punjab's broiler and layer belt.**
 
+👉 **[Read the Complete Product Requirements Document & Client Guide (PRD.md)](./PRD.md)** for a non-technical walkthrough, feature breakdowns, and test guides.
+
 ---
 
 ## 🌾 The Problem
@@ -54,7 +56,7 @@ Punjab produces over 30 crore broilers annually. Yet small-to-midsize poultry fa
 ### 3. Pankh Connect (Veterinary Escalation & Directory)
 - **Punjab Poultry Care Directory**: Geospatial matching of certified veterinarians, disease diagnostic laboratories, and poultry farmers' associations across Ludhiana, Sangrur, Patiala, and Jalandhar.
 - **Informed Consent Gate (Hard Rule #6)**: Farmer's phone number, flock size, and 7-day trend summary are transmitted via WhatsApp **only after** explicit farmer modal authorization.
-- **Twilio Dispatcher**: Direct automated WhatsApp messaging with SMS fallback.
+- **Direct WhatsApp Dispatcher**: Native Click-to-Chat deep link (`wa.me`) with structured bilingual clinical summary, zero third-party subscription costs, and native fallback.
 
 ### 4. Pankh Farm Economics (Flock Cost & Profit Ledger)
 - **Flock Financial Metrics**: Real-time tracking of Total Batch Cost, Feed Cost Share (%), Revenue, Gross Margin, and Cost per Surviving Bird.
@@ -117,9 +119,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 | `OPENROUTER_API_KEY` | LLM API key for veterinary assistant queries | [OpenRouter](https://openrouter.ai) |
 | `OPENWEATHER_API_KEY` | Live hyper-local microclimate weather context | [OpenWeatherMap](https://openweathermap.org/api) |
 | `GOOGLE_CLOUD_API_KEY` | Speech-to-Text (`pa-IN` / `hi-IN`) voice input | [Google Cloud Console](https://console.cloud.google.com) |
-| `TWILIO_ACCOUNT_SID` | Twilio Account SID for WhatsApp & SMS alerts | [Twilio Console](https://console.twilio.com) |
-| `TWILIO_AUTH_TOKEN` | Twilio Auth Token | [Twilio Console](https://console.twilio.com) |
-| `TWILIO_WHATSAPP_NUMBER` | Twilio WhatsApp sender number (`+14155238886`) | Twilio Sandbox |
+| `DIRECT_WHATSAPP` | Built-in zero-cost Click-to-Chat engine (`wa.me`) | Native (No API key needed) |
 
 ---
 
